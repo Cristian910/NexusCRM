@@ -1,0 +1,59 @@
+export const ENDPOINTS = {
+  auth: {
+    login:    "/auth/login",
+    register: "/auth/register",
+    refresh:  "/auth/refresh",
+    logout:   "/auth/logout",
+    me:       "/users/me",  // /auth/me only returns JWT payload; /users/me returns full SafeUser
+  },
+  users: {
+    list:           "/users",
+    me:             "/users/me",
+    updateMe:       "/users/me",
+    changePassword: "/users/me/password",
+    invite:         "/users/invite",
+    detail:         (id: string) => `/users/${id}`,
+    updateRole:     (id: string) => `/users/${id}/role`,
+    deactivate:     (id: string) => `/users/${id}`,
+  },
+  organizations: {
+    me:     "/organizations/me",
+    update: "/organizations/me",
+  },
+  clients: {
+    list:   "/clients",
+    create: "/clients",
+    detail: (id: string) => `/clients/${id}`,
+    update: (id: string) => `/clients/${id}`,
+    delete: (id: string) => `/clients/${id}`,
+  },
+  deals: {
+    list:        "/deals",
+    create:      "/deals",
+    detail:      (id: string) => `/deals/${id}`,
+    update:      (id: string) => `/deals/${id}`,
+    delete:      (id: string) => `/deals/${id}`,
+    updateStage: (id: string) => `/deals/${id}/stage`,
+  },
+  notifications: {
+    list:        "/notifications",
+    markRead:    (id: string) => `/notifications/${id}/read`,
+    markAllRead: "/notifications/read-all",
+    unreadCount: "/notifications/unread-count",
+  },
+  analytics: {
+    overview:        "/analytics/overview",
+    deals:           "/analytics/deals",
+    users:           "/analytics/users",
+    clients:         "/analytics/clients",
+  },
+  tasks: {
+    list:         "/tasks",
+    create:       "/tasks",
+    detail:       (id: string) => `/tasks/${id}`,
+    update:       (id: string) => `/tasks/${id}`,
+    delete:       (id: string) => `/tasks/${id}`,
+    complete:     (id: string) => `/tasks/${id}/complete`,
+    cancel:       (id: string) => `/tasks/${id}/cancel`,
+  },
+} as const;

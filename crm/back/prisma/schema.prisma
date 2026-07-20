@@ -1,0 +1,255 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id            String             @id @default(cuid())
+  name          String
+  slug          String             @unique
+  status        OrganizationStatus @default(ACTIVE)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  activities    Activity[]
+  clients       Client[]
+  deals         Deal[]
+  notifications Notification[]
+  tasks         Task[]
+  users         User[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String         @id @default(cuid())
+  email          String
+  password       String
+  firstName      String
+  lastName       String
+  role           Role           @default(MEMBER)
+  isActive       Boolean        @default(true)
+  refreshToken   String?
+  organizationId String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  activities     Activity[]
+  createdClients Client[]
+  assignedDeals  Deal[]         @relation("AssignedDeals")
+  createdDeals   Deal[]         @relation("CreatedDeals")
+  notifications  Notification[]
+  assignedTasks  Task[]         @relation("AssignedTasks")
+  createdTasks   Task[]         @relation("CreatedTasks")
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([email, organizationId])
+  @@index([organizationId])
+  @@index([email])
+  @@map("users")
+}
+
+model Client {
+  id             String       @id @default(cuid())
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  website        String?
+  notes          String?
+  status         ClientStatus @default(ACTIVE)
+  organizationId String
+  createdById    String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  createdBy      User         @relation(fields: [createdById], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deals          Deal[]
+
+  @@unique([email, organizationId])
+  @@index([organizationId])
+  @@index([name])
+  @@index([email])
+  @@index([organizationId, createdAt])
+  @@index([organizationId, status])
+  @@map("clients")
+}
+
+model Deal {
+  id                String             @id @default(cuid())
+  title             String
+  value             Decimal            @default(0) @db.Decimal(15, 2)
+  stage             DealStage          @default(LEAD)
+  expectedCloseDate DateTime?
+  notes             String?
+  clientId          String
+  assignedToId      String?
+  createdById       String
+  organizationId    String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  stageHistory      DealStageHistory[]
+  assignedTo        User?              @relation("AssignedDeals", fields: [assignedToId], references: [id])
+  client            Client             @relation(fields: [clientId], references: [id])
+  createdBy         User               @relation("CreatedDeals", fields: [createdById], references: [id])
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tasks             Task[]
+
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([assignedToId])
+  @@index([stage])
+  @@index([createdAt])
+  @@index([organizationId, stage])
+  @@index([organizationId, createdAt])
+  @@index([organizationId, assignedToId])
+  @@index([organizationId, stage, createdAt])
+  @@map("deals")
+}
+
+model DealStageHistory {
+  id          String     @id @default(cuid())
+  dealId      String
+  fromStage   DealStage?
+  toStage     DealStage
+  changedById String
+  note        String?
+  createdAt   DateTime   @default(now())
+  deal        Deal       @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([dealId])
+  @@map("deal_stage_history")
+}
+
+model Task {
+  id             String       @id @default(cuid())
+  title          String
+  description    String?
+  dueDate        DateTime?
+  status         TaskStatus   @default(PENDING)
+  assignedToId   String?
+  dealId         String?
+  createdById    String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  assignedTo     User?        @relation("AssignedTasks", fields: [assignedToId], references: [id])
+  createdBy      User         @relation("CreatedTasks", fields: [createdById], references: [id])
+  deal           Deal?        @relation(fields: [dealId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([assignedToId])
+  @@index([dealId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([organizationId, status])
+  @@index([organizationId, dueDate])
+  @@map("tasks")
+}
+
+model Activity {
+  id             String       @id @default(cuid())
+  type           ActivityType
+  description    String
+  entityId       String
+  entityType     EntityType
+  metadata       Json?
+  userId         String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([entityId, entityType])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+model Notification {
+  id             String           @id @default(cuid())
+  title          String
+  message        String
+  type           NotificationType @default(INFO)
+  read           Boolean          @default(false)
+  userId         String
+  organizationId String
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum OrganizationStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum DealStage {
+  LEAD
+  CONTACTED
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ActivityType {
+  CLIENT_CREATED
+  CLIENT_UPDATED
+  CLIENT_ARCHIVED
+  DEAL_CREATED
+  DEAL_UPDATED
+  DEAL_STAGE_CHANGED
+  DEAL_ASSIGNED
+  DEAL_CLOSED_WON
+  DEAL_CLOSED_LOST
+  TASK_CREATED
+  TASK_COMPLETED
+  TASK_CANCELLED
+  USER_INVITED
+}
+
+enum EntityType {
+  CLIENT
+  DEAL
+  TASK
+  USER
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
