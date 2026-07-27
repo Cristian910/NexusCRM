@@ -7,23 +7,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, TrendingUp, CheckSquare,
   BarChart2, Settings, Bell, ChevronLeft, ChevronRight,
-  Zap, Activity, X,
+  Activity, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui";
+import { useTranslation } from "@/lib/i18n/context";
+import { Logomark } from "@/components/brand/logomark";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",     href: "/dashboard",     icon: LayoutDashboard },
-  { label: "Clients",       href: "/clients",        icon: Users           },
-  { label: "Deals",         href: "/deals",          icon: TrendingUp      },
-  { label: "Tasks",         href: "/tasks",          icon: CheckSquare     },
-  { label: "Analytics",     href: "/analytics",      icon: BarChart2       },
-  { label: "Notifications", href: "/notifications",  icon: Bell            },
-  { label: "Activity",      href: "/activity",       icon: Activity        },
+  { key: "nav.dashboard",     href: "/dashboard",     icon: LayoutDashboard },
+  { key: "nav.clients",       href: "/clients",        icon: Users           },
+  { key: "nav.deals",         href: "/deals",          icon: TrendingUp      },
+  { key: "nav.tasks",         href: "/tasks",          icon: CheckSquare     },
+  { key: "nav.analytics",     href: "/analytics",      icon: BarChart2       },
+  { key: "nav.notifications", href: "/notifications",  icon: Bell            },
+  { key: "nav.activity",      href: "/activity",       icon: Activity        },
 ] as const;
 
 const BOTTOM_ITEMS = [
-  { label: "Settings", href: "/settings", icon: Settings },
+  { key: "nav.settings", href: "/settings", icon: Settings },
 ] as const;
 
 interface SidebarProps {
@@ -36,6 +38,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
@@ -45,18 +48,23 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         initial={false}
         animate={{ width: collapsed ? 64 : 240 }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-        className="relative hidden h-screen shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar lg:flex z-20"
+        className="relative hidden h-screen shrink-0 lg:flex z-20"
       >
-        <SidebarContents
-          collapsed={collapsed}
-          isActive={isActive}
-        />
+        {/* Clipped content area — overflow-hidden lives here, NOT on the
+            outer <aside>, so the collapse button below (which intentionally
+            sits half outside the sidebar's right edge) never gets cut off. */}
+        <div className="flex h-full w-full flex-col overflow-hidden border-r border-sidebar-border bg-sidebar">
+          <SidebarContents
+            collapsed={collapsed}
+            isActive={isActive}
+          />
+        </div>
 
         {/* Collapse toggle */}
         <button
           onClick={onToggle}
           className="absolute -right-3 top-[72px] z-30 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? t("nav.expandSidebar") : t("nav.collapseSidebar")}
         >
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
         </button>
@@ -90,7 +98,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                   <button
                     onClick={onMobileClose}
                     className="ml-auto rounded-md p-1.5 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent"
-                    aria-label="Close menu"
+                    aria-label={t("common.closeMenu")}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -117,9 +125,7 @@ function SidebarContents({ collapsed, isActive, onNavigate, closeButton }: Sideb
       {/* Logo */}
       <div className="flex h-14 items-center border-b border-sidebar-border px-4 shrink-0">
         <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0" onClick={onNavigate}>
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <Zap className="h-4 w-4 text-primary-foreground" />
-          </div>
+          <Logomark size={28} className="shrink-0" />
           <AnimatePresence initial={false}>
             {!collapsed && (
               <motion.span
@@ -128,7 +134,7 @@ function SidebarContents({ collapsed, isActive, onNavigate, closeButton }: Sideb
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.15 }}
-                className="text-sm font-semibold text-sidebar-foreground whitespace-nowrap overflow-hidden"
+                className="font-display text-sm font-semibold tracking-tight text-sidebar-foreground whitespace-nowrap overflow-hidden"
               >
                 NexusCRM
               </motion.span>
@@ -156,7 +162,7 @@ function SidebarContents({ collapsed, isActive, onNavigate, closeButton }: Sideb
 }
 
 interface NavItemProps {
-  item: { label: string; href: string; icon: React.ElementType };
+  item: { key: string; href: string; icon: React.ElementType };
   active: boolean;
   collapsed: boolean;
   onNavigate?: () => void;
@@ -164,6 +170,8 @@ interface NavItemProps {
 
 function NavItem({ item, active, collapsed, onNavigate }: NavItemProps) {
   const Icon = item.icon;
+  const { t } = useTranslation();
+  const label = t(item.key);
 
   const linkContent = (
     <Link
@@ -198,7 +206,7 @@ function NavItem({ item, active, collapsed, onNavigate }: NavItemProps) {
             transition={{ duration: 0.15 }}
             className="relative z-10 whitespace-nowrap overflow-hidden"
           >
-            {item.label}
+            {label}
           </motion.span>
         )}
       </AnimatePresence>
@@ -209,7 +217,7 @@ function NavItem({ item, active, collapsed, onNavigate }: NavItemProps) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-        <TooltipContent side="right">{item.label}</TooltipContent>
+        <TooltipContent side="right">{label}</TooltipContent>
       </Tooltip>
     );
   }

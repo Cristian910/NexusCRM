@@ -10,13 +10,10 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { Can } from "@/components/auth/can";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ClientStatus } from "../types";
 
-const STATUS_OPTIONS: { label: string; value: ClientStatus }[] = [
-  { label: "Active",   value: "ACTIVE"   },
-  { label: "Inactive", value: "INACTIVE" },
-  { label: "Archived", value: "ARCHIVED" },
-];
+const STATUS_VALUES: ClientStatus[] = ["ACTIVE", "INACTIVE", "ARCHIVED"];
 
 interface ClientsToolbarProps {
   search: string;
@@ -32,6 +29,7 @@ export function ClientsToolbar({
   search, onSearchChange, statusFilter, onStatusChange,
   totalCount, isLoading, onCreate,
 }: ClientsToolbarProps) {
+  const { t } = useTranslation();
   const hasFilters = !!search || !!statusFilter;
 
   return (
@@ -39,7 +37,7 @@ export function ClientsToolbar({
       {/* Search */}
       <div className="flex-1 min-w-[200px] max-w-sm">
         <Input
-          placeholder="Search by name or email…"
+          placeholder={t("clients.searchPlaceholder")}
           startIcon={<Search className="h-3.5 w-3.5" />}
           endIcon={
             search ? (
@@ -47,7 +45,7 @@ export function ClientsToolbar({
                 onClick={() => onSearchChange("")}
                 className="transition-colors"
                 style={{ color: "hsl(var(--muted-foreground))" }}
-                aria-label="Clear search"
+                aria-label={t("clients.clearSearch")}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -74,19 +72,19 @@ export function ClientsToolbar({
             }
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            {statusFilter ? STATUS_OPTIONS.find((s) => s.value === statusFilter)?.label : "Status"}
+            {statusFilter ? t(`clients.status.${statusFilter}`) : t("clients.statusFilterLabel")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-40">
-          <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("clients.filterByStatus")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {STATUS_OPTIONS.map(({ label, value }) => (
+          {STATUS_VALUES.map((value) => (
             <DropdownMenuCheckboxItem
               key={value}
               checked={statusFilter === value}
               onCheckedChange={(checked) => onStatusChange(checked ? value : undefined)}
             >
-              {label}
+              {t(`clients.status.${value}`)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -109,7 +107,7 @@ export function ClientsToolbar({
               onClick={() => { onSearchChange(""); onStatusChange(undefined); }}
               style={{ color: "hsl(var(--muted-foreground))" }}
             >
-              <X className="h-3 w-3" /> Clear
+              <X className="h-3 w-3" /> {t("clients.clear")}
             </Button>
           </motion.div>
         )}
@@ -128,7 +126,9 @@ export function ClientsToolbar({
             className="text-xs tabular-nums hidden sm:block"
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
-            {totalCount.toLocaleString()} client{totalCount !== 1 ? "s" : ""}
+            {totalCount === 1
+              ? t("clients.clientCountSingular", { count: totalCount })
+              : t("clients.clientCountPlural", { count: totalCount })}
           </motion.span>
         )}
       </AnimatePresence>
@@ -137,7 +137,7 @@ export function ClientsToolbar({
       <Can permission="clients.write">
         <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={onCreate}>
           <UserPlus className="h-3.5 w-3.5" />
-          New client
+          {t("clients.newClient")}
         </Button>
       </Can>
     </div>

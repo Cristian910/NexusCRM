@@ -1,104 +1,193 @@
 @import "tailwindcss";
+@import "./fonts.css";
 
-/* ── Design tokens via @theme (Tailwind v4) ─────────────────────── */
+/* ══════════════════════════════════════════════════════════════════
+   NEXUSCRM DESIGN SYSTEM
+   ──────────────────────────────────────────────────────────────────
+   Concept: "Momentum" — a CRM's whole job is moving a deal from cold
+   to closed. The palette makes that literal: every stage in the
+   pipeline sits on one continuous hue journey from slate (Lead) through
+   violet (Contacted) to amber (Negotiation) and finally to signal teal
+   (Won) — the same teal that is the product's own brand color, so a
+   won deal visually "arrives" at the brand. Lost deals fall out of the
+   gradient entirely, rendered as a quiet, desaturated rose.
+   Base surface is a true ink-navy (not a neutral gray-black), paired
+   with a signal teal accent — deliberately not the default shadcn
+   blue, not terracotta-on-cream, not near-black-with-neon.
+   Type: Space Grotesk (display/numbers) + Manrope (UI/body) +
+   JetBrains Mono (currency, counts, anything tabular).
+   Geometry: tight 8px radius on controls (buttons, inputs, badges —
+   "this is something you operate") vs. soft 16–20px radius on
+   surfaces (cards, modals — "this is something you read").
+   ══════════════════════════════════════════════════════════════════ */
+
 @theme {
   /* Layout */
   --spacing-sidebar: 240px;
   --spacing-sidebar-collapsed: 64px;
   --spacing-topbar: 56px;
 
-  /* Border radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  /* Border radius — tight for controls, soft for surfaces */
+  --radius-sm: 0.3125rem;   /* 5px  — chips, tiny controls */
+  --radius-md: 0.5rem;      /* 8px  — buttons, inputs, dropdown items */
+  --radius-lg: 1rem;        /* 16px — cards, panels */
+  --radius-xl: 1.25rem;     /* 20px — modals, elevated showcase surfaces */
+  --radius-2xl: 1.5rem;     /* 24px — hero/marketing surfaces */
 
   /* Typography */
-  --font-family-sans: system-ui, -apple-system, sans-serif;
-  --font-family-mono: ui-monospace, monospace;
+  --font-family-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-family-display: "Space Grotesk", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+  /* Tailwind v4 auto-generates font-sans / font-display / font-mono utilities from these */
+  --font-sans: var(--font-family-sans);
+  --font-display: var(--font-family-display);
+  --font-mono: var(--font-family-mono);
 
   /* Animation */
   --animate-shimmer: shimmer 2s infinite linear;
   --animate-fade-in: fade-in 0.2s ease-out both;
   --animate-slide-in-left: slide-in-left 0.25s ease-out both;
+  --animate-flow: flow 8s linear infinite;
 }
 
-/* ── CSS Variables: Dark Mode (default) ─────────────────────── */
+/* ── CSS Variables: Dark Mode (default) ─────────────────────────
+   Ink-navy base (hue 228) — deeper and warmer than a neutral gray,
+   reads as "ink" rather than "off". Everything sits a few steps of
+   lightness above the last, so elevation is legible without heavy
+   shadows.
+------------------------------------------------------------------ */
 :root {
-  /* Colors */
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  /* Core surfaces */
+  --background: 228 32% 6%;
+  --foreground: 220 22% 96%;
 
-  --card: 240 10% 5.9%;
-  --card-foreground: 0 0% 98%;
+  --card: 228 26% 9%;
+  --card-foreground: 220 22% 96%;
 
-  --popover: 240 10% 5.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 228 28% 10%;
+  --popover-foreground: 220 22% 96%;
 
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
+  /* Signal — the brand color. Dark text on a bright accent is a
+     deliberate reversal of the default white-on-blue SaaS button. */
+  --primary: 174 72% 45%;
+  --primary-foreground: 228 32% 8%;
 
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 228 18% 15%;
+  --secondary-foreground: 220 22% 96%;
 
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
+  --muted: 228 18% 13%;
+  --muted-foreground: 220 12% 63%;
 
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 228 20% 16%;
+  --accent-foreground: 220 22% 96%;
 
-  --destructive: 0 72.2% 50.6%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive: 356 70% 54%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --ring: 221.2 83.2% 53.3%;
+  --success: 150 60% 42%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 55%;
+  --warning-foreground: 228 32% 8%;
 
-  /* Sidebar */
-  --sidebar-background: 240 10% 4.8%;
-  --sidebar-foreground: 240 4.8% 95.9%;
-  --sidebar-primary: 221.2 83.2% 53.3%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 3.7% 12%;
-  --sidebar-accent-foreground: 240 4.8% 95.9%;
-  --sidebar-border: 240 3.7% 10%;
-  --sidebar-ring: 221.2 83.2% 53.3%;
+  --border: 228 16% 17%;
+  --input: 228 16% 19%;
+  --ring: 174 72% 45%;
 
-  /* Shadow vars */
-  --shadow-card: 0 0 0 1px hsl(var(--border)), 0 2px 4px -1px hsl(0 0% 0% / 0.12);
-  --shadow-card-hover: 0 0 0 1px hsl(var(--border)), 0 4px 12px -2px hsl(0 0% 0% / 0.2);
-  --shadow-dialog: 0 0 0 1px hsl(var(--border)), 0 20px 48px -8px hsl(0 0% 0% / 0.4);
+  /* Sidebar — one step deeper than the base for quiet separation */
+  --sidebar-background: 228 34% 5%;
+  --sidebar-foreground: 220 18% 90%;
+  --sidebar-primary: 174 72% 45%;
+  --sidebar-primary-foreground: 228 32% 8%;
+  --sidebar-accent: 228 22% 11%;
+  --sidebar-accent-foreground: 220 22% 96%;
+  --sidebar-border: 228 20% 12%;
+  --sidebar-ring: 174 72% 45%;
+
+  /* Pipeline stage scale — cold → hot → signal. The same hues also
+     drive the brand gradient below, so "closing a deal" and "the
+     product's own color" are literally the same value. */
+  --stage-lead: 230 45% 64%;
+  --stage-contacted: 265 55% 65%;
+  --stage-negotiation: 35 90% 58%;
+  --stage-won: 174 72% 45%;
+  --stage-lost: 356 25% 58%;
+
+  /* Shadows — layered hairline + soft ink falloff */
+  --shadow-card: 0 0 0 1px hsl(var(--border)), 0 2px 8px -2px hsl(228 60% 2% / 0.35);
+  --shadow-card-hover: 0 0 0 1px hsl(var(--border)), 0 16px 32px -12px hsl(228 60% 2% / 0.5);
+  --shadow-dialog: 0 0 0 1px hsl(var(--border)), 0 24px 64px -12px hsl(228 60% 2% / 0.55);
+  --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.55), 0 0 28px -4px hsl(var(--primary) / 0.5);
+
+  /* Signature gradient — the pipeline, made visible. Used sparingly:
+     logo mark, ambient auth backgrounds, kanban stage accents. */
+  --gradient-signal: linear-gradient(
+    120deg,
+    hsl(var(--stage-lead)) 0%,
+    hsl(var(--stage-contacted)) 38%,
+    hsl(var(--stage-negotiation)) 68%,
+    hsl(var(--stage-won)) 100%
+  );
 }
 
-/* ── Light Mode Override ─────────────────────────────────────── */
+/* ── Light Mode Override ───────────────────────────────────────
+   Cool paper background (not pure white) with pure-white cards
+   lifted a step above it — the same elevation logic as dark mode,
+   inverted.
+------------------------------------------------------------------ */
 .light {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
+  --background: 220 25% 98%;
+  --foreground: 228 30% 11%;
+
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
+  --card-foreground: 228 30% 11%;
+
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --primary: 221.2 83.2% 53.3%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 221.2 83.2% 53.3%;
-  --sidebar-background: 240 4.8% 97%;
-  --sidebar-foreground: 240 5.9% 10%;
-  --sidebar-primary: 221.2 83.2% 53.3%;
+  --popover-foreground: 228 30% 11%;
+
+  /* Darker + white text — tuned separately from dark mode for its own contrast */
+  --primary: 174 78% 32%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 20% 94%;
+  --secondary-foreground: 228 30% 14%;
+
+  --muted: 220 20% 94%;
+  --muted-foreground: 220 10% 42%;
+
+  --accent: 220 20% 93%;
+  --accent-foreground: 228 30% 14%;
+
+  --destructive: 356 72% 48%;
+  --destructive-foreground: 0 0% 100%;
+
+  --success: 150 65% 32%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 88% 42%;
+  --warning-foreground: 0 0% 100%;
+
+  --border: 220 20% 88%;
+  --input: 220 18% 85%;
+  --ring: 174 78% 32%;
+
+  --sidebar-background: 220 28% 96%;
+  --sidebar-foreground: 228 25% 16%;
+  --sidebar-primary: 174 78% 32%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 4.8% 92%;
-  --sidebar-accent-foreground: 240 5.9% 10%;
-  --sidebar-border: 240 5.9% 90%;
-  --sidebar-ring: 221.2 83.2% 53.3%;
+  --sidebar-accent: 220 22% 91%;
+  --sidebar-accent-foreground: 228 30% 14%;
+  --sidebar-border: 220 20% 87%;
+  --sidebar-ring: 174 78% 32%;
+
+  --stage-lead: 230 40% 52%;
+  --stage-contacted: 265 45% 52%;
+  --stage-negotiation: 35 85% 45%;
+  --stage-won: 174 78% 32%;
+  --stage-lost: 356 20% 48%;
+
+  --shadow-card: 0 0 0 1px hsl(var(--border)), 0 1px 3px -1px hsl(220 30% 20% / 0.08);
+  --shadow-card-hover: 0 0 0 1px hsl(var(--border)), 0 12px 24px -10px hsl(220 30% 20% / 0.16);
+  --shadow-dialog: 0 0 0 1px hsl(var(--border)), 0 24px 48px -12px hsl(220 30% 20% / 0.22);
+  --shadow-glow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 0 24px -6px hsl(var(--primary) / 0.35);
 }
 
 /* ── Base ────────────────────────────────────────────────────── */
@@ -118,6 +207,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Headings default to the display face across the whole app — one
+   change here re-types every <h1>–<h4> in the product. */
+h1, h2, h3, h4 {
+  font-family: var(--font-family-display);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Tabular data (currency, counts, dates) reads better in mono —
+   opt in per-element with .font-mono / .tabular-nums as already
+   used throughout the app; this just makes the numerals monospaced
+   and lines up decimal points in tables automatically. */
+.tabular-nums, .font-mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 /* ── Utility classes (used via className) ──────────────────── */
@@ -128,6 +235,8 @@ body {
 .bg-secondary { background-color: hsl(var(--secondary)); }
 .bg-accent { background-color: hsl(var(--accent)); }
 .bg-destructive { background-color: hsl(var(--destructive)); }
+.bg-success { background-color: hsl(var(--success)); }
+.bg-warning { background-color: hsl(var(--warning)); }
 .bg-sidebar { background-color: hsl(var(--sidebar-background)); }
 .bg-popover { background-color: hsl(var(--popover)); }
 
@@ -140,6 +249,8 @@ body {
 .text-accent-foreground { color: hsl(var(--accent-foreground)); }
 .text-destructive { color: hsl(var(--destructive)); }
 .text-destructive-foreground { color: hsl(var(--destructive-foreground)); }
+.text-success { color: hsl(var(--success)); }
+.text-warning { color: hsl(var(--warning)); }
 .text-sidebar-foreground { color: hsl(var(--sidebar-foreground)); }
 .text-sidebar-primary { color: hsl(var(--sidebar-primary)); }
 .text-sidebar-accent-foreground { color: hsl(var(--sidebar-accent-foreground)); }
@@ -168,6 +279,16 @@ body {
 .shadow-card { box-shadow: var(--shadow-card); }
 .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
 .shadow-dialog { box-shadow: var(--shadow-dialog); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+
+/* Signature gradient — text + surface variants */
+.text-gradient-signal {
+  background: var(--gradient-signal);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bg-gradient-signal { background: var(--gradient-signal); }
 
 /* ── Custom scrollbar ────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -201,6 +322,7 @@ body {
   );
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
 }
 
 /* ── Fade in ─────────────────────────────────────────────────── */
@@ -217,6 +339,16 @@ body {
 @keyframes slide-in-left {
   from { opacity: 0; transform: translateX(-8px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Signature flow — slow drifting gradient for ambient surfaces ── */
+@keyframes flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-flow {
+  background-size: 200% 200%;
+  animation: flow 8s linear infinite;
 }
 
 /* ── Radix animation helpers ─────────────────────────────────── */

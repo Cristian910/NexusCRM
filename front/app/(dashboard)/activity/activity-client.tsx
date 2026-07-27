@@ -8,11 +8,13 @@ import { ActivityTable } from "@/features/activity/components/activity-table";
 import { ActivityFilters } from "@/features/activity/components/activity-filters";
 import { useActivity } from "@/features/activity/hooks/use-activity";
 import { Pagination } from "@/components/ui/pagination";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ActivityType, EntityType } from "@/types/activity";
 
 const LIMIT = 30;
 
 export function ActivityClient() {
+  const { t } = useTranslation();
   const [activityType, setActivityType] = useState<ActivityType | undefined>();
   const [entityType, setEntityType]     = useState<EntityType | undefined>();
   const [page, setPage]                 = useState(1);
@@ -40,8 +42,8 @@ export function ActivityClient() {
           transition={{ duration: 0.2 }}
         >
           <PageHeader
-            title="Activity Log"
-            description="Full audit trail of actions across your organization"
+            title={t("activity.pageTitle")}
+            description={t("activity.pageDescription")}
           />
         </motion.div>
 
@@ -55,15 +57,15 @@ export function ActivityClient() {
           <span className="relative flex h-2 w-2">
             <span
               className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-              style={{ background: "hsl(142 71% 45%)" }}
+              style={{ background: "hsl(var(--success))" }}
             />
             <span
               className="relative inline-flex h-2 w-2 rounded-full"
-              style={{ background: "hsl(142 71% 45%)" }}
+              style={{ background: "hsl(var(--success))" }}
             />
           </span>
           <span className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-            Live — updates every 30 seconds
+            {t("activity.liveIndicator")}
           </span>
         </motion.div>
 
@@ -106,7 +108,7 @@ export function ActivityClient() {
               limit={LIMIT}
               onPageChange={setPage}
               isLoading={isLoading}
-              itemLabel="activities"
+              itemLabel={t("common.items")}
             />
           </motion.div>
         )}

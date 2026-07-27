@@ -10,7 +10,7 @@ export interface SendEmailJobPayload {
   context: Record<string, unknown>;
 }
 
-export type EmailTemplate = 'deal-assigned' | 'task-assigned' | 'task-reminder';
+export type EmailTemplate = 'deal-assigned' | 'task-assigned' | 'task-reminder' | 'password-reset';
 
 // ─── Notification jobs ────────────────────────────────────────────────────────
 

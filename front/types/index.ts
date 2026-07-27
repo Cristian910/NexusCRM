@@ -31,6 +31,16 @@ export interface LoginPayload {
   organizationSlug: string;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+  organizationSlug: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
 export interface RegisterPayload {
   email: string;
   password: string;

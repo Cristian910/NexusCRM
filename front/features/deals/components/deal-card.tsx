@@ -7,6 +7,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Calendar, User, GripVertical, TrendingUp } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { STAGE_CONFIG } from "./kanban-config";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Deal } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ interface DealCardProps {
 type CSSVarStyle = React.CSSProperties & { [key: `--${string}`]: string | number | undefined };
 
 export function DealCard({ deal, onClick, isDragging }: DealCardProps) {
+  const { t } = useTranslation();
   const {
     attributes, listeners, setNodeRef,
     transform, transition, isDragging: isSortableDragging,
@@ -81,7 +83,7 @@ export function DealCard({ deal, onClick, isDragging }: DealCardProps) {
               {...attributes}
               {...listeners}
               onClick={(e) => e.stopPropagation()}
-              aria-label="Drag to reorder"
+              aria-label={t("deals.dragToReorder")}
             >
               <GripVertical className="h-3.5 w-3.5" />
             </button>
@@ -116,7 +118,7 @@ export function DealCard({ deal, onClick, isDragging }: DealCardProps) {
           {/* Footer: value + date */}
           <div className="mt-2.5 flex items-center justify-between gap-2">
             <span
-              className="text-sm font-semibold tabular-nums"
+              className="font-mono text-sm font-semibold tabular-nums"
               style={{ color: "hsl(var(--foreground))" }}
             >
               {formatCurrency(deal.value ?? 0)}

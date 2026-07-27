@@ -14,7 +14,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ReactNode; color: stri
         <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3a.75.75 0 1 1 0 1.5A.75.75 0 0 1 8 4zm.75 7.25h-1.5v-4h1.5v4z" />
       </svg>
     ),
-    color: "hsl(221 83% 53%)",
+    color: "hsl(var(--primary))",
   },
   SUCCESS: {
     icon: (
@@ -22,7 +22,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ReactNode; color: stri
         <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm3.28 4.97-4.5 4.5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06l1.47 1.47 3.97-3.97a.75.75 0 1 1 1.06 1.06z" />
       </svg>
     ),
-    color: "hsl(142 71% 45%)",
+    color: "hsl(var(--success))",
   },
   WARNING: {
     icon: (
@@ -30,7 +30,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ReactNode; color: stri
         <path d="M7.12 1.566a1 1 0 0 1 1.76 0l6 11A1 1 0 0 1 14 14H2a1 1 0 0 1-.88-1.434l6-11zM8 5.5a.75.75 0 0 0-.75.75v3a.75.75 0 0 0 1.5 0v-3A.75.75 0 0 0 8 5.5zM8 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
       </svg>
     ),
-    color: "hsl(43 96% 56%)",
+    color: "hsl(var(--warning))",
   },
   ERROR: {
     icon: (
@@ -38,7 +38,7 @@ const TYPE_CONFIG: Record<NotificationType, { icon: React.ReactNode; color: stri
         <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm2.78 9.22a.75.75 0 0 1-1.06 1.06L8 9.06l-1.72 1.72a.75.75 0 0 1-1.06-1.06L6.94 8 5.22 6.28a.75.75 0 0 1 1.06-1.06L8 6.94l1.72-1.72a.75.75 0 0 1 1.06 1.06L9.06 8l1.72 1.72z" />
       </svg>
     ),
-    color: "hsl(0 72% 51%)",
+    color: "hsl(var(--destructive))",
   },
 };
 

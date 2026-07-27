@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Search, Plus, Menu } from "lucide-react";
+import { Search, Plus, Menu, Briefcase, Users, CheckSquare, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, getInitials } from "@/components/ui/avatar";
@@ -11,8 +11,12 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { NotificationBell } from "@/features/notifications/components/notification-bell";
+import { LanguageSwitcher } from "./language-switcher";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { useLogout } from "@/features/auth/hooks/use-auth";
+import { useQuickCreateStore } from "@/lib/stores/quick-create-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { useTranslation } from "@/lib/i18n/context";
 import { cn } from "@/lib/utils";
 
 interface TopbarProps {
@@ -21,6 +25,8 @@ interface TopbarProps {
 }
 
 export function Topbar({ className, onMenuClick }: TopbarProps) {
+  const { t } = useTranslation();
+
   return (
     <header
       className={cn(
@@ -36,7 +42,7 @@ export function Topbar({ className, onMenuClick }: TopbarProps) {
         onClick={onMenuClick}
         className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-accent lg:hidden"
         style={{ color: "hsl(var(--muted-foreground))" }}
-        aria-label="Open menu"
+        aria-label={t("topbar.openMenu")}
       >
         <Menu className="h-4.5 w-4.5" />
       </button>
@@ -46,10 +52,9 @@ export function Topbar({ className, onMenuClick }: TopbarProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-1.5">
-        <Button size="sm" className="gap-1.5 hidden sm:inline-flex">
-          <Plus className="h-3.5 w-3.5" />
-          New
-        </Button>
+        <NewMenu />
+        <HelpButton />
+        <LanguageSwitcher />
         <NotificationBell />
         <UserMenu />
       </div>
@@ -57,12 +62,64 @@ export function Topbar({ className, onMenuClick }: TopbarProps) {
   );
 }
 
+function HelpButton() {
+  const { t } = useTranslation();
+  const openTour = useOnboardingStore((s) => s.openTour);
+  return (
+    <button
+      onClick={openTour}
+      className="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-accent"
+      style={{ color: "hsl(var(--muted-foreground))" }}
+      aria-label={t("onboarding.helpButtonLabel")}
+      title={t("onboarding.helpButtonLabel")}
+    >
+      <HelpCircle className="h-4 w-4" />
+    </button>
+  );
+}
+
+/**
+ * Global quick-create — previously a decorative button with no onClick.
+ * Now opens the right modal from anywhere via useQuickCreateStore, mounted
+ * once in DashboardShell so it works regardless of which page you're on.
+ */
+function NewMenu() {
+  const { t } = useTranslation();
+  const open = useQuickCreateStore((s) => s.open);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" className="gap-1.5 hidden sm:inline-flex">
+          <Plus className="h-3.5 w-3.5" />
+          {t("common.new")}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-44">
+        <DropdownMenuItem onClick={() => open("deal")} className="gap-2">
+          <Briefcase className="h-3.5 w-3.5" />
+          {t("common.newDeal")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => open("client")} className="gap-2">
+          <Users className="h-3.5 w-3.5" />
+          {t("common.newClient")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => open("task")} className="gap-2">
+          <CheckSquare className="h-3.5 w-3.5" />
+          {t("common.newTask")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 function SearchBar() {
+  const { t } = useTranslation();
   const [focused, setFocused] = React.useState(false);
 
   return (
     <Input
-      placeholder="Search clients, deals, tasks…"
+      placeholder={t("topbar.searchPlaceholder")}
       startIcon={<Search className="h-3.5 w-3.5" />}
       endIcon={
         !focused ? (
@@ -89,10 +146,11 @@ function SearchBar() {
 
 function UserMenu() {
   const router = useRouter();
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const { mutate: logout, isPending } = useLogout();
 
-  const displayName = user ? `${user.firstName} ${user.lastName}` : "Loading…";
+  const displayName = user ? `${user.firstName} ${user.lastName}` : "…";
   const email = user?.email ?? "";
 
   return (
@@ -124,11 +182,11 @@ function UserMenu() {
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/settings?tab=profile")}>Profile</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/settings?tab=team")}>Team settings</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings?tab=profile")}>{t("topbar.profile")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings?tab=team")}>{t("topbar.teamSettings")}</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem destructive disabled={isPending} onClick={() => logout()}>
-          {isPending ? "Signing out…" : "Sign out"}
+          {isPending ? t("topbar.signingOut") : t("topbar.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

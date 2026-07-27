@@ -12,11 +12,13 @@ import { ClientModal } from "@/features/clients/components/client-modal";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { usePermissions } from "@/lib/hooks/use-permissions";
 import { useDebounce } from "@/lib/hooks";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Client, ClientStatus } from "@/features/clients/types";
 
 const LIMIT = 20;
 
 export function ClientsClient() {
+  const { t } = useTranslation();
   const [search, setSearch]         = useState("");
   const [statusFilter, setStatus]   = useState<ClientStatus | undefined>();
   const [page, setPage]             = useState(1);
@@ -49,7 +51,7 @@ export function ClientsClient() {
     <ProtectedRoute permission="clients.read">
       <div className="space-y-4 pb-8">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <PageHeader title="Clients" description="Manage your organization's clients and contacts" />
+          <PageHeader title={t("clients.pageTitle")} description={t("clients.pageDescription")} />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.04 }}>
@@ -72,7 +74,7 @@ export function ClientsClient() {
             style={{ borderColor: "hsl(var(--destructive) / 0.3)", background: "hsl(var(--destructive) / 0.07)", color: "hsl(var(--destructive))" }}
           >
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{error?.message ?? "Failed to load clients."}</span>
+            <span>{error?.message ?? t("clients.failedToLoad")}</span>
           </motion.div>
         )}
 
@@ -93,7 +95,7 @@ export function ClientsClient() {
               limit={LIMIT}
               onPageChange={setPage}
               isLoading={isLoading}
-              itemLabel="clients"
+              itemLabel={t("common.items")}
             />
           </motion.div>
         )}

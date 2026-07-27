@@ -4,7 +4,10 @@
  */
 import { apiClient } from "@/lib/api/client";
 import { ENDPOINTS } from "@/lib/api/endpoints";
-import type { AuthResponse, AuthTokens, LoginPayload, RegisterPayload, SafeUser } from "@/types";
+import type {
+  AuthResponse, AuthTokens, LoginPayload, RegisterPayload, SafeUser,
+  ForgotPasswordPayload, ResetPasswordPayload,
+} from "@/types";
 
 export const authService = {
   async login(payload: LoginPayload): Promise<AuthResponse> {
@@ -14,6 +17,16 @@ export const authService = {
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {
     const { data } = await apiClient.post<AuthResponse>(ENDPOINTS.auth.register, payload);
+    return data;
+  },
+
+  async forgotPassword(payload: ForgotPasswordPayload): Promise<{ message: string }> {
+    const { data } = await apiClient.post<{ message: string }>(ENDPOINTS.auth.forgotPassword, payload);
+    return data;
+  },
+
+  async resetPassword(payload: ResetPasswordPayload): Promise<{ message: string }> {
+    const { data } = await apiClient.post<{ message: string }>(ENDPOINTS.auth.resetPassword, payload);
     return data;
   },
 

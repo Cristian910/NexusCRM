@@ -6,8 +6,10 @@ import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotificationPanel } from "./notification-panel";
 import { useUnreadCount } from "../hooks/use-notifications";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function NotificationBell() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { data } = useUnreadCount();
@@ -22,7 +24,7 @@ export function NotificationBell() {
         className="relative"
         style={{ color: "hsl(var(--muted-foreground))" }}
         onClick={() => setOpen((v) => !v)}
-        aria-label={`Notifications${unread > 0 ? ` — ${unread} unread` : ""}`}
+        aria-label={unread > 0 ? t("notifications.bellLabelUnread", { count: unread }) : t("notifications.bellLabel")}
         aria-expanded={open}
       >
         <Bell className="h-4 w-4" />

@@ -11,8 +11,10 @@ import { FormField } from "./form-field";
 import { PasswordInput } from "./password-input";
 import { AuthError } from "./auth-error";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function RegisterForm() {
+  const { t } = useTranslation();
   const { mutate: register, isPending } = useRegister();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -40,13 +42,11 @@ export function RegisterForm() {
     register(payload, {
       onError: (err) => {
         if (err.statusCode === 409) {
-          setServerError(
-            "An organization with this name already exists. Try a different name."
-          );
+          setServerError(t("auth.orgAlreadyExists"));
         } else if (err.statusCode === 0) {
-          setServerError("Unable to connect. Please check your internet connection.");
+          setServerError(t("common.unableToConnect"));
         } else {
-          setServerError(err.message ?? "Something went wrong. Please try again.");
+          setServerError(err.message ?? t("common.somethingWrong"));
         }
       },
     });
@@ -65,8 +65,8 @@ export function RegisterForm() {
         {/* Name row */}
         <div className="grid grid-cols-2 gap-3">
           <FormField
-            label="First name"
-            placeholder="Alex"
+            label={t("auth.firstName")}
+            placeholder={t("auth.firstNamePlaceholder")}
             autoComplete="given-name"
             startIcon={<User className="h-3.5 w-3.5" />}
             error={errors.firstName?.message}
@@ -74,8 +74,8 @@ export function RegisterForm() {
             {...field("firstName")}
           />
           <FormField
-            label="Last name"
-            placeholder="Rivera"
+            label={t("auth.lastName")}
+            placeholder={t("auth.lastNamePlaceholder")}
             autoComplete="family-name"
             error={errors.lastName?.message}
             disabled={isPending}
@@ -85,21 +85,21 @@ export function RegisterForm() {
 
         {/* Organization */}
         <FormField
-          label="Organization name"
-          placeholder="Acme Corp"
+          label={t("auth.organizationName")}
+          placeholder={t("auth.organizationNamePlaceholder")}
           autoComplete="organization"
           startIcon={<Building2 className="h-3.5 w-3.5" />}
           error={errors.organizationName?.message}
-          hint="This becomes your workspace name"
+          hint={t("auth.organizationNameHint")}
           disabled={isPending}
           {...field("organizationName")}
         />
 
         {/* Email */}
         <FormField
-          label="Work email"
+          label={t("auth.workEmail")}
           type="email"
-          placeholder="you@company.com"
+          placeholder={t("auth.emailPlaceholder")}
           autoComplete="email"
           startIcon={<Mail className="h-3.5 w-3.5" />}
           error={errors.email?.message}
@@ -109,19 +109,19 @@ export function RegisterForm() {
 
         {/* Password */}
         <PasswordInput
-          label="Password"
-          placeholder="Min. 8 characters"
+          label={t("auth.password")}
+          placeholder={t("auth.passwordMinChars")}
           autoComplete="new-password"
           error={errors.password?.message}
-          hint="Uppercase, lowercase, number, and special character required"
+          hint={t("auth.passwordRequirementsHint")}
           disabled={isPending}
           {...field("password")}
         />
 
         {/* Confirm password */}
         <PasswordInput
-          label="Confirm password"
-          placeholder="Repeat your password"
+          label={t("auth.confirmPassword")}
+          placeholder={t("auth.confirmPasswordPlaceholder")}
           autoComplete="new-password"
           error={errors.confirmPassword?.message}
           disabled={isPending}
@@ -135,7 +135,7 @@ export function RegisterForm() {
           loading={isPending}
           disabled={isPending}
         >
-          {isPending ? "Creating your workspace…" : "Create workspace"}
+          {isPending ? t("auth.creatingAccount") : t("auth.createAccount")}
         </Button>
       </form>
     </motion.div>

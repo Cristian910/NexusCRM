@@ -16,11 +16,13 @@ import {
 import { InviteMemberModal } from "./invite-member-modal";
 import { useTeamMembers, useUpdateUserRole, useDeactivateUser } from "@/features/users/hooks/use-users";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useTranslation } from "@/lib/i18n/context";
 import type { SafeUser, Role } from "@/types";
 
 const ASSIGNABLE_ROLES: Role[] = ["ADMIN", "MEMBER", "VIEWER"];
 
 export function TeamTab() {
+  const { t } = useTranslation();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [deactivateTarget, setDeactivateTarget] = useState<SafeUser | null>(null);
   const currentUser = useAuthStore((s) => s.user);
@@ -33,12 +35,14 @@ export function TeamTab() {
     <div className="max-w-2xl space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
-          {team?.length ?? 0} member{team?.length !== 1 ? "s" : ""} in your organization
+          {(team?.length ?? 0) === 1
+            ? t("settings.memberCountSingular", { count: team?.length ?? 0 })
+            : t("settings.memberCountPlural", { count: team?.length ?? 0 })}
         </p>
         <Can permission="users.manage">
           <Button size="sm" className="gap-1.5" onClick={() => setInviteOpen(true)}>
             <UserPlus className="h-3.5 w-3.5" />
-            Invite teammate
+            {t("settings.inviteTeammate")}
           </Button>
         </Can>
       </div>
@@ -59,8 +63,8 @@ export function TeamTab() {
         ) : !team || team.length === 0 ? (
           <EmptyState
             icon={UserPlus}
-            title="No teammates yet"
-            description="Invite people to collaborate on clients, deals, and tasks together."
+            title={t("settings.noTeammatesYet")}
+            description={t("settings.noTeammatesDescription")}
           />
         ) : (
           <div className="divide-y" style={{ borderColor: "hsl(var(--border))" }}>
@@ -76,13 +80,13 @@ export function TeamTab() {
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 text-sm font-medium truncate" style={{ color: "hsl(var(--foreground))" }}>
                       {member.firstName} {member.lastName}
-                      {isSelf && <span style={{ color: "hsl(var(--muted-foreground))" }}>(you)</span>}
+                      {isSelf && <span style={{ color: "hsl(var(--muted-foreground))" }}>{t("settings.you")}</span>}
                       {!member.isActive && (
                         <span
                           className="rounded px-1.5 py-0.5 text-[10px] font-medium"
                           style={{ background: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))" }}
                         >
-                          Deactivated
+                          {t("settings.deactivated")}
                         </span>
                       )}
                     </p>
@@ -94,12 +98,12 @@ export function TeamTab() {
                     {!isSelf && member.isActive && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-sm" aria-label="Member actions">
+                          <Button variant="ghost" size="icon-sm" aria-label={t("settings.memberActions")}>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel className="text-xs">Change role</DropdownMenuLabel>
+                          <DropdownMenuLabel className="text-xs">{t("settings.changeRole")}</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           {ASSIGNABLE_ROLES.filter((r) => r !== member.role).map((r) => (
                             <DropdownMenuItem
@@ -107,13 +111,13 @@ export function TeamTab() {
                               onClick={() => roleMut.mutate({ id: member.id, payload: { role: r } })}
                             >
                               <ShieldCheck className="h-3.5 w-3.5" />
-                              Make {r.charAt(0) + r.slice(1).toLowerCase()}
+                              {t("settings.makeRole", { role: t(`roles.${r}`) })}
                             </DropdownMenuItem>
                           ))}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem destructive onClick={() => setDeactivateTarget(member)}>
                             <UserX className="h-3.5 w-3.5" />
-                            Deactivate
+                            {t("settings.deactivate")}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -130,9 +134,9 @@ export function TeamTab() {
 
       <ConfirmDialog
         open={!!deactivateTarget}
-        title={`Deactivate ${deactivateTarget?.firstName}?`}
-        description="They'll immediately lose access to this organization. This can be reversed by an admin later."
-        confirmLabel="Deactivate"
+        title={t("settings.deactivateTitle", { name: deactivateTarget?.firstName ?? "" })}
+        description={t("settings.deactivateDescription")}
+        confirmLabel={t("settings.deactivate")}
         onConfirm={() => {
           if (!deactivateTarget) return;
           deactivateMut.mutate(deactivateTarget.id, { onSuccess: () => setDeactivateTarget(null) });

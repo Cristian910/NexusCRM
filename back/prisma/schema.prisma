@@ -33,6 +33,9 @@ model User {
   role           Role           @default(MEMBER)
   isActive       Boolean        @default(true)
   refreshToken   String?
+  // Password reset — token itself is hashed at rest, same pattern as refreshToken.
+  resetPasswordToken     String?
+  resetPasswordExpiresAt DateTime?
   organizationId String
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt

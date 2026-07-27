@@ -11,9 +11,7 @@ import { FormField } from "@/features/auth/components/form-field";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-
-// Using a single concrete type for the form (createClientSchema)
-// and casting on submit for the edit case. This avoids resolver union issues.
+import { useTranslation, resolveFormMessage } from "@/lib/i18n/context";
 
 interface ClientFormProps {
   mode: "create" | "edit";
@@ -27,6 +25,7 @@ interface ClientFormProps {
 export function ClientForm({
   mode, defaultValues, onSubmit, onCancel, isSubmitting, error,
 }: ClientFormProps) {
+  const { t } = useTranslation();
   const { register, handleSubmit, formState: { errors } } = useForm<CreateClientValues>({
     resolver: zodResolver(createClientSchema),
     defaultValues: {
@@ -60,7 +59,7 @@ export function ClientForm({
 
       {/* Name */}
       <FormField
-        label="Full name *"
+        label={t("clients.fullNameLabel")}
         placeholder="Jane Smith"
         autoComplete="name"
         startIcon={<User className="h-3.5 w-3.5" />}
@@ -72,7 +71,7 @@ export function ClientForm({
       {/* Email + Phone */}
       <div className="grid gap-3 sm:grid-cols-2">
         <FormField
-          label="Email"
+          label={t("clients.emailLabel")}
           type="email"
           placeholder="jane@company.com"
           autoComplete="email"
@@ -82,7 +81,7 @@ export function ClientForm({
           {...register("email")}
         />
         <FormField
-          label="Phone"
+          label={t("clients.phoneLabel")}
           type="tel"
           placeholder="+1 555 000 0000"
           autoComplete="tel"
@@ -96,7 +95,7 @@ export function ClientForm({
       {/* Company + Website */}
       <div className="grid gap-3 sm:grid-cols-2">
         <FormField
-          label="Company"
+          label={t("clients.companyLabel")}
           placeholder="Acme Corp"
           startIcon={<Building2 className="h-3.5 w-3.5" />}
           error={errors.company?.message}
@@ -104,7 +103,7 @@ export function ClientForm({
           {...register("company")}
         />
         <FormField
-          label="Website"
+          label={t("clients.websiteLabel")}
           type="url"
           placeholder="https://acme.com"
           startIcon={<Globe className="h-3.5 w-3.5" />}
@@ -121,12 +120,12 @@ export function ClientForm({
             className="h-3.5 w-3.5"
             style={{ color: "hsl(var(--muted-foreground))" }}
           />
-          Notes
+          {t("clients.notesLabel")}
         </Label>
         <textarea
           id="notes"
           rows={3}
-          placeholder="Any relevant notes about this client…"
+          placeholder={t("clients.notesPlaceholder")}
           disabled={isSubmitting}
           className={cn(
             "w-full resize-none rounded-md border px-3 py-2 text-sm",
@@ -144,7 +143,7 @@ export function ClientForm({
         />
         {errors.notes && (
           <p className="text-xs" style={{ color: "hsl(var(--destructive))" }}>
-            {errors.notes.message}
+            {resolveFormMessage(t, errors.notes.message)}
           </p>
         )}
       </div>
@@ -161,7 +160,7 @@ export function ClientForm({
           onClick={onCancel}
           disabled={isSubmitting}
         >
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button
           type="submit"
@@ -170,8 +169,8 @@ export function ClientForm({
           disabled={isSubmitting}
         >
           {mode === "create"
-            ? isSubmitting ? "Creating…" : "Create client"
-            : isSubmitting ? "Saving…"   : "Save changes"}
+            ? isSubmitting ? t("clients.creating") : t("clients.createClient")
+            : isSubmitting ? t("common.saving")     : t("clients.saveChanges")}
         </Button>
       </div>
     </form>

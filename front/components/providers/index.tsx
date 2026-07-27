@@ -7,6 +7,7 @@ import { getQueryClient } from "@/lib/query-client";
 import { AuthInitializer } from "./auth-initializer";
 import { RealtimeInitializer } from "./realtime-initializer";
 import { Toaster } from "@/components/ui/toast";
+import { I18nProvider } from "@/lib/i18n/context";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -22,15 +23,17 @@ export function Providers({ children }: ProvidersProps) {
       enableSystem={false}
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
-        <AuthInitializer />
-        <RealtimeInitializer />
-        {children}
-        <Toaster />
-        {process.env.NODE_ENV === "development" && (
-          <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
-        )}
-      </QueryClientProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthInitializer />
+          <RealtimeInitializer />
+          {children}
+          <Toaster />
+          {process.env.NODE_ENV === "development" && (
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
+          )}
+        </QueryClientProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 }

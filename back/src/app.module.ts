@@ -25,6 +25,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { QueuesModule } from './queues/queues.module';
 import { EventsModule } from './events/events.module';
+import { HealthModule } from './health/health.module';
 
 import { JwtAccessGuard } from './auth/guards/jwt-access.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -67,6 +68,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     ReportsModule,
     QueuesModule,
     EventsModule,
+    HealthModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

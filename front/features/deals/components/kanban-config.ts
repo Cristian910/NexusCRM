@@ -1,37 +1,40 @@
 import type { DealStage, KanbanColumn } from "../types";
 
+// Colors reference the pipeline "temperature scale" defined in globals.css
+// (--stage-lead → --stage-lost) so the kanban board, charts, and badges all
+// pull from the exact same source of truth as the brand gradient.
 export const STAGE_CONFIG: Record<
   DealStage,
   { label: string; color: string; accent: string; probability: number }
 > = {
   LEAD: {
     label: "Lead",
-    color: "hsl(238 76% 65%)",
-    accent: "hsl(238 76% 65% / 0.2)",
+    color: "hsl(var(--stage-lead))",
+    accent: "hsl(var(--stage-lead) / 0.16)",
     probability: 10,
   },
   CONTACTED: {
     label: "Contacted",
-    color: "hsl(262 73% 62%)",
-    accent: "hsl(262 73% 62% / 0.2)",
+    color: "hsl(var(--stage-contacted))",
+    accent: "hsl(var(--stage-contacted) / 0.16)",
     probability: 25,
   },
   NEGOTIATION: {
     label: "Negotiation",
-    color: "hsl(43 96% 56%)",
-    accent: "hsl(43 96% 56% / 0.2)",
+    color: "hsl(var(--stage-negotiation))",
+    accent: "hsl(var(--stage-negotiation) / 0.16)",
     probability: 60,
   },
   CLOSED_WON: {
     label: "Won",
-    color: "hsl(142 71% 45%)",
-    accent: "hsl(142 71% 45% / 0.2)",
+    color: "hsl(var(--stage-won))",
+    accent: "hsl(var(--stage-won) / 0.16)",
     probability: 100,
   },
   CLOSED_LOST: {
     label: "Lost",
-    color: "hsl(0 72% 51%)",
-    accent: "hsl(0 72% 51% / 0.2)",
+    color: "hsl(var(--stage-lost))",
+    accent: "hsl(var(--stage-lost) / 0.16)",
     probability: 0,
   },
 };

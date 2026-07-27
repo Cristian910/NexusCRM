@@ -8,6 +8,7 @@ import { tasksService } from "../tasks.service";
 import type { TaskFilters, CreateTaskPayload, UpdateTaskPayload, Task, TasksPage } from "../types";
 import type { ApiError } from "@/types";
 import { toast } from "@/lib/stores/toast-store";
+import { t as translate } from "@/lib/i18n/context";
 
 // ── Query key factory ─────────────────────────────────────────────
 export const taskKeys = {
@@ -43,9 +44,9 @@ export function useCreateTask() {
         };
       });
       qc.invalidateQueries({ queryKey: taskKeys.lists() });
-      toast.success("Task created");
+      toast.success(translate("toasts.taskCreated"));
     },
-    onError: (err) => toast.error("Couldn't create task", err.message),
+    onError: (err) => toast.error(translate("toasts.taskCreateFailed"), err.message),
   });
 }
 
@@ -61,9 +62,9 @@ export function useUpdateTask() {
         if (!old) return old;
         return { ...old, data: old.data.map((t) => (t.id === updated.id ? updated : t)) };
       });
-      toast.success("Task updated");
+      toast.success(translate("toasts.taskUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update task", err.message),
+    onError: (err) => toast.error(translate("toasts.taskUpdateFailed"), err.message),
   });
 }
 
@@ -81,16 +82,16 @@ function useTaskTransition(fn: (id: string) => Promise<Task>, successMessage: st
       });
       toast.success(successMessage);
     },
-    onError: (err) => toast.error("Something went wrong", err.message),
+    onError: (err) => toast.error(translate("toasts.genericFailed"), err.message),
   });
 }
 
 export function useCompleteTask() {
-  return useTaskTransition(tasksService.complete, "Task marked complete");
+  return useTaskTransition(tasksService.complete, translate("toasts.taskMarkedComplete"));
 }
 
 export function useCancelTask() {
-  return useTaskTransition(tasksService.cancel, "Task cancelled");
+  return useTaskTransition(tasksService.cancel, translate("toasts.taskCancelled"));
 }
 
 // ── useDeleteTask ────────────────────────────────────────────────
@@ -118,9 +119,9 @@ export function useDeleteTask() {
     },
     onError: (err, _id, ctx) => {
       ctx?.snapshots?.forEach((data, key) => qc.setQueryData(key, data));
-      toast.error("Couldn't delete task", err.message);
+      toast.error(translate("toasts.taskDeleteFailed"), err.message);
     },
-    onSuccess: () => toast.success("Task deleted"),
+    onSuccess: () => toast.success(translate("toasts.taskDeleted")),
     onSettled: () => qc.invalidateQueries({ queryKey: taskKeys.lists() }),
   });
 }

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useClientsAnalytics } from "../hooks/use-analytics";
 import { ChartWrapper, ChartSkeleton, ChartEmpty, ChartError } from "@/components/charts/chart-wrapper";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { AnalyticsFilters } from "../types";
 
 interface TopClientsTableProps {
@@ -12,6 +13,7 @@ interface TopClientsTableProps {
 }
 
 export function TopClientsTable({ filters }: TopClientsTableProps) {
+  const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useClientsAnalytics(filters);
 
   if (isLoading) return <ChartSkeleton height={280} />;
@@ -21,14 +23,14 @@ export function TopClientsTable({ filters }: TopClientsTableProps) {
 
   return (
     <ChartWrapper
-      title="Top Clients"
-      description="By total deal value"
+      title={t("analytics.topClients")}
+      description={t("analytics.byTotalDealValue")}
       height={280}
     >
       {isError ? (
         <ChartError onRetry={refetch} />
       ) : !top.length ? (
-        <ChartEmpty message="No client deal data yet" />
+        <ChartEmpty message={t("analytics.noClientDealData")} />
       ) : (
         <div className="space-y-0 px-4 pb-2">
           {top.slice(0, 6).map((client, i) => {
@@ -75,7 +77,7 @@ export function TopClientsTable({ filters }: TopClientsTableProps) {
                     <motion.div
                       className="h-full rounded-full"
                       style={{
-                        background: `hsl(${221 + i * 6} 83% ${53 - i * 3}%)`,
+                        background: `hsl(${174 + i * 8} 65% ${48 - i * 2}%)`,
                         width: `${pct}%`,
                       }}
                       initial={{ width: 0 }}
@@ -86,7 +88,9 @@ export function TopClientsTable({ filters }: TopClientsTableProps) {
 
                   {/* Sub-info */}
                   <p className="text-[10px]" style={{ color: "hsl(var(--muted-foreground))" }}>
-                    {client.totalDeals} deal{client.totalDeals !== 1 ? "s" : ""}
+                    {client.totalDeals === 1
+                      ? t("deals.dealCountSingular", { count: client.totalDeals })
+                      : t("deals.dealCountPlural", { count: client.totalDeals })}
                     {client.company ? ` · ${client.company}` : ""}
                   </p>
                 </div>

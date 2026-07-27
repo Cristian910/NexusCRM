@@ -16,24 +16,24 @@ const badgeVariants = cva(
         outline:
           "bg-transparent text-foreground ring-border",
         success:
-          "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
+          "bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] ring-[hsl(var(--success)/0.25)]",
         warning:
-          "bg-amber-500/10 text-amber-400 ring-amber-500/20",
+          "bg-[hsl(var(--warning)/0.1)] text-[hsl(var(--warning))] ring-[hsl(var(--warning)/0.25)]",
         purple:
-          "bg-purple-500/10 text-purple-400 ring-purple-500/20",
+          "bg-[hsl(var(--stage-contacted)/0.1)] text-[hsl(var(--stage-contacted))] ring-[hsl(var(--stage-contacted)/0.25)]",
         // CRM-specific
         active:
-          "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
+          "bg-[hsl(var(--success)/0.1)] text-[hsl(var(--success))] ring-[hsl(var(--success)/0.25)]",
         inactive:
-          "bg-zinc-500/10 text-zinc-400 ring-zinc-500/20",
+          "bg-muted text-muted-foreground ring-border",
         lead:
-          "bg-indigo-500/10 text-indigo-400 ring-indigo-500/20",
+          "bg-[hsl(var(--stage-lead)/0.1)] text-[hsl(var(--stage-lead))] ring-[hsl(var(--stage-lead)/0.25)]",
         won:
-          "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
+          "bg-[hsl(var(--stage-won)/0.1)] text-[hsl(var(--stage-won))] ring-[hsl(var(--stage-won)/0.25)]",
         lost:
-          "bg-red-500/10 text-red-400 ring-red-500/20",
+          "bg-[hsl(var(--stage-lost)/0.1)] text-[hsl(var(--stage-lost))] ring-[hsl(var(--stage-lost)/0.25)]",
         negotiation:
-          "bg-amber-500/10 text-amber-400 ring-amber-500/20",
+          "bg-[hsl(var(--stage-negotiation)/0.1)] text-[hsl(var(--stage-negotiation))] ring-[hsl(var(--stage-negotiation)/0.25)]",
       },
     },
     defaultVariants: {

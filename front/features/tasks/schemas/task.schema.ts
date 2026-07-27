@@ -1,15 +1,16 @@
 import { z } from "zod";
 
 // The form works with string values (empty string = not provided).
-// Mirrors CreateTaskDto / UpdateTaskDto exactly.
+// Mirrors CreateTaskDto / UpdateTaskDto exactly. Messages are translation
+// keys, resolved by FormField — see lib/i18n/context.ts#resolveFormMessage.
 export const taskFormSchema = z.object({
   title: z
     .string()
-    .min(2, "Title must be at least 2 characters")
-    .max(200, "Title must not exceed 200 characters"),
+    .min(2, "validation.titleMin")
+    .max(200, "validation.titleMax"),
   description: z
     .string()
-    .max(2000, "Description must not exceed 2000 characters"),
+    .max(2000, "validation.descriptionMax"),
   dueDate: z.string(),
   assignedToId: z.string(),
   dealId: z.string(),

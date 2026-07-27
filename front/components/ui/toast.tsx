@@ -4,6 +4,7 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
 import { useToastStore } from "@/lib/stores/toast-store";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ToastVariant } from "@/lib/stores/toast-store";
 
 const ICONS: Record<ToastVariant, React.ElementType> = {
@@ -13,7 +14,7 @@ const ICONS: Record<ToastVariant, React.ElementType> = {
 };
 
 const ACCENTS: Record<ToastVariant, string> = {
-  success: "hsl(142 71% 45%)",
+  success: "hsl(var(--success))",
   error: "hsl(var(--destructive))",
   info: "hsl(var(--primary))",
 };
@@ -24,6 +25,7 @@ const ACCENTS: Record<ToastVariant, string> = {
  * helper exported from lib/stores/toast-store.
  */
 export function Toaster() {
+  const { t } = useTranslation();
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
 
@@ -34,11 +36,11 @@ export function Toaster() {
       aria-atomic="false"
     >
       <AnimatePresence initial={false}>
-        {toasts.map((t) => {
-          const Icon = ICONS[t.variant];
+        {toasts.map((item) => {
+          const Icon = ICONS[item.variant];
           return (
             <motion.div
-              key={t.id}
+              key={item.id}
               layout
               initial={{ opacity: 0, y: -12, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -48,21 +50,21 @@ export function Toaster() {
               style={{ background: "hsl(var(--popover))", borderColor: "hsl(var(--border))" }}
               role="status"
             >
-              <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0" style={{ color: ACCENTS[t.variant] }} />
+              <Icon className="mt-0.5 h-[18px] w-[18px] shrink-0" style={{ color: ACCENTS[item.variant] }} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium" style={{ color: "hsl(var(--popover-foreground))" }}>
-                  {t.title}
+                  {item.title}
                 </p>
-                {t.description && (
+                {item.description && (
                   <p className="mt-0.5 text-xs leading-relaxed" style={{ color: "hsl(var(--muted-foreground))" }}>
-                    {t.description}
+                    {item.description}
                   </p>
                 )}
               </div>
               <button
-                onClick={() => dismiss(t.id)}
+                onClick={() => dismiss(item.id)}
                 className="shrink-0 rounded p-0.5 transition-colors hover:bg-accent"
-                aria-label="Dismiss notification"
+                aria-label={t("common.dismissNotification")}
               >
                 <X className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
               </button>

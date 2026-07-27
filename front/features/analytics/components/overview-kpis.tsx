@@ -8,6 +8,7 @@ import {
 import { KpiCard } from "./kpi-card";
 import { useAnalyticsOverview } from "../hooks/use-analytics";
 import { formatCurrency, formatPercent } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { AnalyticsFilters } from "../types";
 
 interface OverviewKpisProps {
@@ -15,6 +16,7 @@ interface OverviewKpisProps {
 }
 
 export function OverviewKpis({ filters }: OverviewKpisProps) {
+  const { t } = useTranslation();
   const { data, isLoading, isError } = useAnalyticsOverview(filters);
 
   if (isError) {
@@ -28,7 +30,7 @@ export function OverviewKpis({ filters }: OverviewKpisProps) {
       >
         <AlertCircle className="h-4 w-4 shrink-0" style={{ color: "hsl(var(--destructive))" }} />
         <p className="text-sm" style={{ color: "hsl(var(--destructive))" }}>
-          Failed to load KPIs. Check your connection and try refreshing.
+          {t("analytics.failedToLoadKpis")}
         </p>
       </div>
     );
@@ -36,54 +38,54 @@ export function OverviewKpis({ filters }: OverviewKpisProps) {
 
   const cards = [
     {
-      title: "Pipeline Value",
+      title: t("analytics.pipelineValue"),
       value: isLoading ? "—" : formatCurrency(data?.deals.totalPipelineValue ?? 0),
-      subtitle: "Active deals",
+      subtitle: t("analytics.activeDealsSubtitle"),
       icon: <DollarSign className="h-4 w-4" />,
-      iconColor: "hsl(221.2 83.2% 53.3%)",
+      iconColor: "hsl(var(--primary))",
       loading: isLoading,
     },
     {
-      title: "Total Deals",
+      title: t("analytics.totalDeals"),
       value: isLoading ? "—" : String(data?.deals.totalDeals ?? 0),
-      subtitle: `${formatCurrency(data?.deals.wonValue ?? 0)} won`,
+      subtitle: t("analytics.wonSuffix", { value: formatCurrency(data?.deals.wonValue ?? 0) }),
       icon: <TrendingUp className="h-4 w-4" />,
-      iconColor: "hsl(262 73% 62%)",
+      iconColor: "hsl(var(--stage-contacted))",
       loading: isLoading,
     },
     {
-      title: "Conversion Rate",
+      title: t("analytics.conversionRate"),
       value: isLoading ? "—" : formatPercent(data?.deals.conversionRate ?? 0),
-      subtitle: "Won / total deals",
+      subtitle: t("analytics.wonTotalRatio"),
       icon: <Activity className="h-4 w-4" />,
-      iconColor: "hsl(142 71% 45%)",
+      iconColor: "hsl(var(--success))",
       loading: isLoading,
     },
     {
-      title: "Active Clients",
+      title: t("analytics.activeClients"),
       value: isLoading ? "—" : String(data?.clients.totalClients ?? 0),
-      subtitle: `+${data?.clients.newClientsInPeriod ?? 0} this period`,
+      subtitle: t("analytics.newThisPeriod", { count: data?.clients.newClientsInPeriod ?? 0 }),
       icon: <Users className="h-4 w-4" />,
-      iconColor: "hsl(43 96% 56%)",
+      iconColor: "hsl(var(--warning))",
       loading: isLoading,
     },
     {
-      title: "Task Completion",
+      title: t("analytics.taskCompletion"),
       value: isLoading ? "—" : formatPercent(data?.tasks.completionRate ?? 0),
-      subtitle: `${data?.tasks.overdueTasks ?? 0} overdue`,
+      subtitle: t("analytics.overdueCount", { count: data?.tasks.overdueTasks ?? 0 }),
       icon: <CheckSquare className="h-4 w-4" />,
       iconColor:
         (data?.tasks.overdueTasks ?? 0) > 0
-          ? "hsl(0 72% 51%)"
-          : "hsl(142 71% 45%)",
+          ? "hsl(var(--destructive))"
+          : "hsl(var(--success))",
       loading: isLoading,
     },
     {
-      title: "Won Revenue",
+      title: t("analytics.wonRevenue"),
       value: isLoading ? "—" : formatCurrency(data?.deals.wonValue ?? 0),
-      subtitle: "Closed won",
+      subtitle: t("analytics.closedWon"),
       icon: <DollarSign className="h-4 w-4" />,
-      iconColor: "hsl(142 71% 45%)",
+      iconColor: "hsl(var(--success))",
       loading: isLoading,
     },
   ];

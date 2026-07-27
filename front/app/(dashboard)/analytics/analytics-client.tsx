@@ -9,19 +9,24 @@ import { ConversionDonutChart } from "@/features/analytics/components/conversion
 import { UserPerformanceChart } from "@/features/analytics/components/user-performance-chart";
 import { TopClientsTable } from "@/features/analytics/components/top-clients-table";
 import { useAnalyticsFilters } from "@/features/analytics/hooks/use-analytics-filters";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function AnalyticsClient() {
-  const { state, filters, setPreset } = useAnalyticsFilters();
+  const { t } = useTranslation();
+  const { state, filters, setPreset, setCustomRange } = useAnalyticsFilters();
 
   return (
     <div className="space-y-6 pb-8">
       <PageHeader
-        title="Analytics"
-        description="Detailed metrics for your organization"
+        title={t("analytics.pageTitle")}
+        description={t("analytics.pageDescription")}
         actions={
           <FilterBar
             activePreset={state.preset}
             onPresetChange={setPreset}
+            dateFrom={state.dateFrom}
+            dateTo={state.dateTo}
+            onCustomRangeChange={setCustomRange}
           />
         }
       />

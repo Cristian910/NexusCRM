@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown";
 import { Can } from "@/components/auth/can";
 import { STAGE_CONFIG, ORDERED_STAGES } from "./kanban-config";
+import { useTranslation } from "@/lib/i18n/context";
 import type { DealStage } from "../types";
 
 interface DealsToolbarProps {
@@ -27,16 +28,18 @@ export function DealsToolbar({
   search, onSearchChange, stageFilter, onStageChange,
   totalDeals, isLoading, onCreate,
 }: DealsToolbarProps) {
+  const { t } = useTranslation();
   const hasFilters = !!search || !!stageFilter;
+  const stageLabel = (s: DealStage) => t(`deals.stages.${s}`);
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="flex-1 min-w-[180px] max-w-xs">
         <Input
-          placeholder="Search deals…"
+          placeholder={t("deals.searchPlaceholder")}
           startIcon={<Search className="h-3.5 w-3.5" />}
           endIcon={search ? (
-            <button onClick={() => onSearchChange("")} aria-label="Clear">
+            <button onClick={() => onSearchChange("")} aria-label={t("deals.clear")}>
               <X className="h-3.5 w-3.5" />
             </button>
           ) : undefined}
@@ -56,11 +59,11 @@ export function DealsToolbar({
             style={stageFilter ? { borderColor: STAGE_CONFIG[stageFilter].color, color: STAGE_CONFIG[stageFilter].color } : {}}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            {stageFilter ? STAGE_CONFIG[stageFilter].label : "Stage"}
+            {stageFilter ? stageLabel(stageFilter) : t("deals.stageFilterLabel")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-44">
-          <DropdownMenuLabel>Filter by stage</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("deals.filterByStage")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {ORDERED_STAGES.map((s) => (
             <DropdownMenuCheckboxItem
@@ -69,7 +72,7 @@ export function DealsToolbar({
               onCheckedChange={(checked) => onStageChange(checked ? s : undefined)}
             >
               <span className="mr-2 h-2 w-2 rounded-full" style={{ background: STAGE_CONFIG[s].color }} />
-              {STAGE_CONFIG[s].label}
+              {stageLabel(s)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -90,7 +93,7 @@ export function DealsToolbar({
               onClick={() => { onSearchChange(""); onStageChange(undefined); }}
               style={{ color: "hsl(var(--muted-foreground))" }}
             >
-              <X className="h-3 w-3" /> Clear
+              <X className="h-3 w-3" /> {t("deals.clear")}
             </Button>
           </motion.div>
         )}
@@ -107,7 +110,9 @@ export function DealsToolbar({
             className="hidden text-xs sm:block"
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
-            {totalDeals} deal{totalDeals !== 1 ? "s" : ""}
+            {totalDeals === 1
+              ? t("deals.dealCountSingular", { count: totalDeals })
+              : t("deals.dealCountPlural", { count: totalDeals })}
           </motion.span>
         )}
       </AnimatePresence>
@@ -116,7 +121,7 @@ export function DealsToolbar({
       <Can permission="deals.write">
         <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={onCreate}>
           <Plus className="h-3.5 w-3.5" />
-          New deal
+          {t("common.newDeal")}
         </Button>
       </Can>
     </div>

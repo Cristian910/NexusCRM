@@ -3,33 +3,34 @@ import { z } from "zod";
 const phoneRegex = /^[+\d\s\-().]+$/;
 
 // The form always works with string values (empty string = not provided).
-// Transformation to undefined happens before calling the service.
+// Transformation to undefined happens before calling the service. Messages
+// are translation keys, resolved by FormField — see lib/i18n/context.ts.
 export const clientFormSchema = z.object({
   name: z
     .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(150, "Name must not exceed 150 characters"),
+    .min(2, "validation.clientNameMin")
+    .max(150, "validation.clientNameMax"),
   email: z
     .string()
     .max(255)
-    .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Please enter a valid email address"),
+    .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "validation.emailInvalid"),
   phone: z
     .string()
-    .max(30, "Phone must not exceed 30 characters")
-    .refine((v) => !v || phoneRegex.test(v), "Phone contains invalid characters"),
+    .max(30, "validation.phoneMax")
+    .refine((v) => !v || phoneRegex.test(v), "validation.phoneInvalid"),
   company: z
     .string()
-    .max(150, "Company must not exceed 150 characters"),
+    .max(150, "validation.companyMax"),
   website: z
     .string()
     .max(255)
     .refine(
       (v) => !v || /^https?:\/\/.+/.test(v),
-      "Please enter a valid URL (include https://)"
+      "validation.urlInvalid"
     ),
   notes: z
     .string()
-    .max(2000, "Notes must not exceed 2000 characters"),
+    .max(2000, "validation.notesMax"),
 });
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>;

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, X } from "lucide-react";
 import React from "react";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface AuthErrorProps {
   message: string | null;
@@ -10,6 +11,7 @@ interface AuthErrorProps {
 }
 
 export function AuthError({ message, onDismiss }: AuthErrorProps) {
+  const { t } = useTranslation();
   return (
     <AnimatePresence>
       {message && (
@@ -29,7 +31,7 @@ export function AuthError({ message, onDismiss }: AuthErrorProps) {
                 type="button"
                 onClick={onDismiss}
                 className="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
-                aria-label="Dismiss error"
+                aria-label={t("common.dismissError")}
               >
                 <X className="h-3.5 w-3.5" />
               </button>

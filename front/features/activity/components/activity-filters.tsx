@@ -9,14 +9,10 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { ACTIVITY_CONFIG } from "./activity-config";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ActivityType, EntityType } from "@/types/activity";
 
-const ENTITY_OPTIONS: { label: string; value: EntityType }[] = [
-  { label: "Clients", value: "CLIENT" },
-  { label: "Deals",   value: "DEAL"   },
-  { label: "Tasks",   value: "TASK"   },
-  { label: "Users",   value: "USER"   },
-];
+const ENTITY_VALUES: EntityType[] = ["CLIENT", "DEAL", "TASK", "USER"];
 
 interface ActivityFiltersProps {
   activityType: ActivityType | undefined;
@@ -32,9 +28,10 @@ export function ActivityFilters({
   onActivityTypeChange, onEntityTypeChange,
   totalCount, isLoading,
 }: ActivityFiltersProps) {
+  const { t } = useTranslation();
   const hasFilters = !!activityType || !!entityType;
 
-  const activityEntries = Object.entries(ACTIVITY_CONFIG).slice(0, 8) as [ActivityType, typeof ACTIVITY_CONFIG[ActivityType]][];
+  const activityTypes = Object.keys(ACTIVITY_CONFIG).slice(0, 8) as ActivityType[];
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -48,20 +45,20 @@ export function ActivityFilters({
             style={activityType ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" } : {}}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            {activityType ? ACTIVITY_CONFIG[activityType]?.label : "Activity type"}
+            {activityType ? t(`activity.types.${activityType}`) : t("activity.typeFilterLabel")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-52">
-          <DropdownMenuLabel>Filter by type</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("activity.filterByType")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {activityEntries.map(([type, cfg]) => (
+          {activityTypes.map((type) => (
             <DropdownMenuCheckboxItem
               key={type}
               checked={activityType === type}
               onCheckedChange={(checked) => onActivityTypeChange(checked ? type : undefined)}
             >
-              <span className="mr-2">{cfg.icon}</span>
-              {cfg.label}
+              <span className="mr-2">{ACTIVITY_CONFIG[type].icon}</span>
+              {t(`activity.types.${type}`)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -76,21 +73,19 @@ export function ActivityFilters({
             className="h-8 gap-1.5 text-xs"
             style={entityType ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" } : {}}
           >
-            {entityType
-              ? ENTITY_OPTIONS.find((e) => e.value === entityType)?.label
-              : "Entity"}
+            {entityType ? t(`activity.entities.${entityType}`) : t("activity.entityFilterLabel")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-36">
-          <DropdownMenuLabel>Filter by entity</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("activity.filterByEntity")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {ENTITY_OPTIONS.map(({ label, value }) => (
+          {ENTITY_VALUES.map((value) => (
             <DropdownMenuCheckboxItem
               key={value}
               checked={entityType === value}
               onCheckedChange={(checked) => onEntityTypeChange(checked ? value : undefined)}
             >
-              {label}
+              {t(`activity.entities.${value}`)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -112,7 +107,7 @@ export function ActivityFilters({
               onClick={() => { onActivityTypeChange(undefined); onEntityTypeChange(undefined); }}
               style={{ color: "hsl(var(--muted-foreground))" }}
             >
-              <X className="h-3 w-3" /> Clear
+              <X className="h-3 w-3" /> {t("activity.clear")}
             </Button>
           </motion.div>
         )}
@@ -129,7 +124,9 @@ export function ActivityFilters({
             className="text-xs tabular-nums"
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
-            {totalCount.toLocaleString()} event{totalCount !== 1 ? "s" : ""}
+            {totalCount === 1
+              ? t("activity.eventCountSingular", { count: totalCount })
+              : t("activity.eventCountPlural", { count: totalCount })}
           </motion.span>
         )}
       </AnimatePresence>

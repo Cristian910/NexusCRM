@@ -8,12 +8,13 @@ import { ChartWrapper, ChartSkeleton, ChartEmpty, ChartError } from "@/component
 import { CustomTooltip } from "@/components/charts/custom-tooltip";
 import { useDealsAnalytics } from "../hooks/use-analytics";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { AnalyticsFilters } from "../types";
 
 const COLORS = {
-  won:      "hsl(142 71% 45%)",
-  lost:     "hsl(0 72% 51%)",
-  pipeline: "hsl(238 76% 65%)",
+  won:      "hsl(var(--stage-won))",
+  lost:     "hsl(var(--stage-lost))",
+  pipeline: "hsl(var(--stage-contacted))",
 };
 
 interface ConversionDonutChartProps {
@@ -21,6 +22,7 @@ interface ConversionDonutChartProps {
 }
 
 export function ConversionDonutChart({ filters }: ConversionDonutChartProps) {
+  const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useDealsAnalytics(filters);
 
   if (isLoading) return <ChartSkeleton height={280} />;
@@ -30,25 +32,25 @@ export function ConversionDonutChart({ filters }: ConversionDonutChartProps) {
   const openDeals = (data?.totalDeals ?? 0) - (wonStage?.count ?? 0) - (lostStage?.count ?? 0);
 
   const chartData = [
-    { name: "Won",      value: wonStage?.count  ?? 0, color: COLORS.won,      money: wonStage?.totalValue  ?? 0 },
-    { name: "Lost",     value: lostStage?.count ?? 0, color: COLORS.lost,     money: lostStage?.totalValue ?? 0 },
-    { name: "Pipeline", value: Math.max(0, openDeals), color: COLORS.pipeline, money: data?.totalPipelineValue ?? 0 },
+    { name: t("analytics.won"),      value: wonStage?.count  ?? 0, color: COLORS.won,      money: wonStage?.totalValue  ?? 0 },
+    { name: t("analytics.lost"),     value: lostStage?.count ?? 0, color: COLORS.lost,     money: lostStage?.totalValue ?? 0 },
+    { name: t("analytics.pipeline"), value: Math.max(0, openDeals), color: COLORS.pipeline, money: data?.totalPipelineValue ?? 0 },
   ].filter((d) => d.value > 0);
 
   return (
     <ChartWrapper
-      title="Win / Loss Breakdown"
+      title={t("analytics.winLossBreakdown")}
       description={
         data
-          ? `${data.conversionRate.toFixed(1)}% conversion rate`
-          : "Deal outcomes"
+          ? t("analytics.conversionRateSuffix", { rate: data.conversionRate.toFixed(1) })
+          : t("analytics.dealOutcomes")
       }
       height={280}
     >
       {isError ? (
         <ChartError onRetry={refetch} />
       ) : !data || data.totalDeals === 0 ? (
-        <ChartEmpty message="No closed deals yet" />
+        <ChartEmpty message={t("analytics.noClosedDeals")} />
       ) : (
         <div className="relative flex h-full flex-col items-center">
           <ResponsiveContainer width="100%" height={200}>
@@ -72,7 +74,7 @@ export function ConversionDonutChart({ filters }: ConversionDonutChartProps) {
               <Tooltip
                 content={
                   <CustomTooltip
-                    valueFormatter={(v) => `${v} deals`}
+                    valueFormatter={(v) => t("analytics.dealsSuffix", { count: v })}
                   />
                 }
               />
@@ -88,16 +90,16 @@ export function ConversionDonutChart({ filters }: ConversionDonutChartProps) {
               {data.conversionRate.toFixed(0)}%
             </p>
             <p className="text-[10px]" style={{ color: "hsl(var(--muted-foreground))" }}>
-              win rate
+              {t("analytics.winRate")}
             </p>
           </div>
 
           {/* Legend row */}
           <div className="mt-2 flex justify-center gap-5">
             {[
-              { label: "Won",      value: wonStage?.count  ?? 0, money: wonStage?.totalValue,  color: COLORS.won  },
-              { label: "Lost",     value: lostStage?.count ?? 0, money: lostStage?.totalValue, color: COLORS.lost },
-              { label: "Pipeline", value: Math.max(0, openDeals), money: data.totalPipelineValue, color: COLORS.pipeline },
+              { label: t("analytics.won"),      value: wonStage?.count  ?? 0, money: wonStage?.totalValue,  color: COLORS.won  },
+              { label: t("analytics.lost"),     value: lostStage?.count ?? 0, money: lostStage?.totalValue, color: COLORS.lost },
+              { label: t("analytics.pipeline"), value: Math.max(0, openDeals), money: data.totalPipelineValue, color: COLORS.pipeline },
             ].map(({ label, value, money, color }) => (
               <div key={label} className="text-center">
                 <div className="flex items-center justify-center gap-1.5">

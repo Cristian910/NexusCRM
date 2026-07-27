@@ -1,29 +1,27 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ClientStatus } from "../types";
 
-const STATUS_CONFIG: Record<ClientStatus, { label: string; dot: string; text: string; bg: string; border: string }> = {
+const STATUS_CONFIG: Record<ClientStatus, { dot: string; text: string; bg: string; border: string }> = {
   ACTIVE: {
-    label:  "Active",
-    dot:    "hsl(142 71% 45%)",
-    text:   "hsl(142 71% 42%)",
-    bg:     "hsl(142 71% 45% / 0.1)",
-    border: "hsl(142 71% 45% / 0.25)",
+    dot:    "hsl(var(--success))",
+    text:   "hsl(var(--success))",
+    bg:     "hsl(var(--success) / 0.1)",
+    border: "hsl(var(--success) / 0.25)",
   },
   INACTIVE: {
-    label:  "Inactive",
     dot:    "hsl(var(--muted-foreground))",
     text:   "hsl(var(--muted-foreground))",
     bg:     "hsl(var(--muted))",
     border: "hsl(var(--border))",
   },
   ARCHIVED: {
-    label:  "Archived",
-    dot:    "hsl(43 96% 56%)",
-    text:   "hsl(43 80% 45%)",
-    bg:     "hsl(43 96% 56% / 0.1)",
-    border: "hsl(43 96% 56% / 0.25)",
+    dot:    "hsl(var(--warning))",
+    text:   "hsl(var(--warning))",
+    bg:     "hsl(var(--warning) / 0.12)",
+    border: "hsl(var(--warning) / 0.3)",
   },
 };
 
@@ -32,6 +30,7 @@ interface ClientStatusBadgeProps {
 }
 
 export function ClientStatusBadge({ status }: ClientStatusBadgeProps) {
+  const { t } = useTranslation();
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.INACTIVE;
   return (
     <span
@@ -43,7 +42,7 @@ export function ClientStatusBadge({ status }: ClientStatusBadgeProps) {
         style={{ background: cfg.dot }}
         aria-hidden="true"
       />
-      {cfg.label}
+      {t(`clients.status.${status}`)}
     </span>
   );
 }

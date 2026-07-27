@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { FormField } from "./form-field";
+import { useTranslation } from "@/lib/i18n/context";
 import type { InputProps } from "@/components/ui/input";
 
 interface PasswordInputProps extends Omit<InputProps, "type" | "endIcon" | "error"> {
@@ -12,6 +13,7 @@ interface PasswordInputProps extends Omit<InputProps, "type" | "endIcon" | "erro
 }
 
 export function PasswordInput({ label, error, hint, ...props }: PasswordInputProps) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -27,7 +29,7 @@ export function PasswordInput({ label, error, hint, ...props }: PasswordInputPro
           className="transition-colors"
           style={{ color: "hsl(var(--muted-foreground))" }}
           tabIndex={-1}
-          aria-label={visible ? "Hide password" : "Show password"}
+          aria-label={visible ? t("common.hidePassword") : t("common.showPassword")}
         >
           {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>

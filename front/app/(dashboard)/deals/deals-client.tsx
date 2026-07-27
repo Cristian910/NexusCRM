@@ -12,9 +12,11 @@ import { PipelineMetrics } from "@/features/deals/components/pipeline-metrics";
 import { useDealsKanban } from "@/features/deals/hooks/use-deals";
 import { usePermissions } from "@/lib/hooks/use-permissions";
 import { useDebounce } from "@/lib/hooks";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Deal, DealStage } from "@/features/deals/types";
 
 export function DealsClient() {
+  const { t } = useTranslation();
   const [search, setSearch]         = useState("");
   const [stageFilter, setStage]     = useState<DealStage | undefined>();
   const debouncedSearch             = useDebounce(search, 300);
@@ -53,7 +55,7 @@ export function DealsClient() {
     <ProtectedRoute permission="deals.read">
       <div className="flex h-full flex-col gap-4 pb-4">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <PageHeader title="Deals" description="Manage your sales pipeline" />
+          <PageHeader title={t("deals.pageTitle")} description={t("deals.pageDescription")} />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.04 }}>

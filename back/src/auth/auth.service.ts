@@ -7,14 +7,20 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { randomBytes, createHash } from 'crypto';
 import { PrismaService } from '@/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { AuthTokens } from './interfaces/auth-tokens.interface';
 import { Prisma, Role } from '@prisma/client';
 import { SafeUser, toSafeUser } from '@/common/types/shared.types';
+import { QueueProducerService } from '@/queues/queue-producer.service';
+
+const RESET_TOKEN_TTL_MINUTES = 30;
 
 @Injectable()
 export class AuthService {
@@ -24,6 +30,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly queueProducer: QueueProducerService,
   ) {}
 
   async register(dto: RegisterDto): Promise<{ user: SafeUser; tokens: AuthTokens }> {
@@ -141,6 +148,93 @@ export class AuthService {
       where: { id: userId },
       data: { refreshToken: null },
     });
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    // Always return the same generic message whether or not the account exists —
+    // this endpoint must never leak which emails/organizations are registered.
+    const genericResponse = {
+      message: 'If an account exists for that email, a reset link has been sent.',
+    };
+
+    const organization = await this.prisma.organization.findUnique({
+      where: { slug: dto.organizationSlug },
+    });
+    if (!organization || organization.status !== 'ACTIVE') {
+      return genericResponse;
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { email_organizationId: { email: dto.email, organizationId: organization.id } },
+    });
+    if (!user || !user.isActive) {
+      return genericResponse;
+    }
+
+    // The raw token goes in the email link; only its SHA-256 digest is persisted.
+    // Unlike passwords, this token is already 256 bits of random entropy, so a
+    // fast, lookup-friendly hash is appropriate here (bcrypt would only slow down
+    // the one legitimate lookup, not a brute-force attempt, which is infeasible
+    // against this much entropy either way).
+    const rawToken = randomBytes(32).toString('hex');
+    const hashedToken = createHash('sha256').update(rawToken).digest('hex');
+    const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MINUTES * 60_000);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetPasswordToken: hashedToken, resetPasswordExpiresAt: expiresAt },
+    });
+
+    const frontendUrl = this.configService.get<string>('app.frontendUrl');
+    const resetUrl = `${frontendUrl}/reset-password?token=${rawToken}`;
+
+    await this.queueProducer.enqueueEmail({
+      to: user.email,
+      toName: `${user.firstName} ${user.lastName}`,
+      subject: 'Reset your password',
+      template: 'password-reset',
+      context: {
+        recipientName: user.firstName,
+        resetUrl,
+        expiresInMinutes: RESET_TOKEN_TTL_MINUTES,
+      },
+    });
+
+    this.logger.log(`Password reset requested for userId=${user.id}`);
+
+    return genericResponse;
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    const hashedToken = createHash('sha256').update(dto.token).digest('hex');
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetPasswordToken: hashedToken,
+        resetPasswordExpiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('This reset link is invalid or has expired');
+    }
+
+    const hashedPassword = await this.hashValue(dto.newPassword);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordExpiresAt: null,
+        // Force re-login on every device as a safety measure after a reset.
+        refreshToken: null,
+      },
+    });
+
+    this.logger.log(`Password reset completed for userId=${user.id}`);
+
+    return { message: 'Your password has been reset. You can now sign in.' };
   }
 
   // ─── Private helpers ─────────────────────────────────────────────────────────

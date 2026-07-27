@@ -4,6 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useTranslation, resolveFormMessage } from "@/lib/i18n/context";
 import type { InputProps } from "@/components/ui/input";
 
 // Omit 'error' from InputProps (bool) and redefine as string | undefined
@@ -13,7 +14,9 @@ interface FormFieldProps extends Omit<InputProps, "error"> {
   hint?: string;
 }
 
-export function FormField({ label, error, hint, id, className, ...props }: FormFieldProps) {
+export function FormField({ label, error: rawError, hint, id, className, ...props }: FormFieldProps) {
+  const { t } = useTranslation();
+  const error = resolveFormMessage(t, rawError);
   const fieldId = id ?? label.toLowerCase().replace(/\s+/g, "-");
 
   return (

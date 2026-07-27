@@ -12,6 +12,7 @@ import { Can } from "@/components/auth/can";
 import { useTeamMembers } from "@/features/users/hooks/use-users";
 import { useDeals } from "@/features/deals/hooks/use-deals";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useTranslation } from "@/lib/i18n/context";
 
 export type TaskFormDefaults = {
   title?: string;
@@ -33,6 +34,7 @@ interface TaskFormProps {
 export function TaskForm({
   mode, defaultValues, onSubmit, onCancel, isSubmitting, error,
 }: TaskFormProps) {
+  const { t } = useTranslation();
   const currentUser = useAuthStore((s) => s.user);
   // Only fetched when the viewer can actually see the team (ADMIN/OWNER on
   // the backend) — everyone else can still assign tasks to themselves.
@@ -67,8 +69,8 @@ export function TaskForm({
       )}
 
       <FormField
-        label="Title *"
-        placeholder="Follow up on proposal"
+        label={t("tasks.titleLabel")}
+        placeholder={t("tasks.titlePlaceholder")}
         error={errors.title?.message}
         disabled={isSubmitting}
         {...register("title")}
@@ -77,12 +79,12 @@ export function TaskForm({
       <div className="space-y-1.5">
         <Label htmlFor="task-description" className="flex items-center gap-1.5">
           <FileText className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
-          Description
+          {t("tasks.descriptionLabel")}
         </Label>
         <textarea
           id="task-description"
           rows={3}
-          placeholder="What needs to happen…"
+          placeholder={t("tasks.descriptionPlaceholder")}
           disabled={isSubmitting}
           className="w-full resize-none rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50"
           style={{ borderColor: "hsl(var(--input))", background: "transparent", color: "hsl(var(--foreground))" }}
@@ -92,7 +94,7 @@ export function TaskForm({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <FormField
-          label="Due date"
+          label={t("tasks.dueDateLabel")}
           type="date"
           startIcon={<Calendar className="h-3.5 w-3.5" />}
           error={errors.dueDate?.message}
@@ -103,7 +105,7 @@ export function TaskForm({
         <div className="space-y-1.5">
           <Label htmlFor="task-assignedToId" className="flex items-center gap-1.5">
             <User className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
-            Assignee
+            {t("tasks.assigneeLabel")}
           </Label>
           <select
             id="task-assignedToId"
@@ -112,10 +114,10 @@ export function TaskForm({
             style={{ borderColor: "hsl(var(--input))", background: "transparent", color: "hsl(var(--foreground))" }}
             {...register("assignedToId")}
           >
-            <option value="">Unassigned</option>
+            <option value="">{t("tasks.unassigned")}</option>
             {currentUser && (
               <option value={currentUser.id} style={{ background: "hsl(var(--popover))" }}>
-                Me ({currentUser.firstName} {currentUser.lastName})
+                {t("tasks.meWithName", { name: `${currentUser.firstName} ${currentUser.lastName}` })}
               </option>
             )}
             <Can permission="users.read">
@@ -134,7 +136,7 @@ export function TaskForm({
       <div className="space-y-1.5">
         <Label htmlFor="task-dealId" className="flex items-center gap-1.5">
           <Briefcase className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
-          Related deal
+          {t("tasks.dealLabel")}
         </Label>
         <select
           id="task-dealId"
@@ -143,7 +145,7 @@ export function TaskForm({
           style={{ borderColor: "hsl(var(--input))", background: "transparent", color: "hsl(var(--foreground))" }}
           {...register("dealId")}
         >
-          <option value="">None</option>
+          <option value="">{t("tasks.none")}</option>
           {deals.map((d) => (
             <option key={d.id} value={d.id} style={{ background: "hsl(var(--popover))" }}>
               {d.title}
@@ -154,12 +156,12 @@ export function TaskForm({
 
       <div className="flex items-center justify-end gap-2 border-t pt-4" style={{ borderColor: "hsl(var(--border))" }}>
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button type="submit" size="sm" loading={isSubmitting} disabled={isSubmitting}>
           {mode === "create"
-            ? isSubmitting ? "Creating…" : "Create task"
-            : isSubmitting ? "Saving…"   : "Save changes"}
+            ? isSubmitting ? t("tasks.creating") : t("tasks.createTask")
+            : isSubmitting ? t("common.saving")  : t("tasks.saveChanges")}
         </Button>
       </div>
     </form>

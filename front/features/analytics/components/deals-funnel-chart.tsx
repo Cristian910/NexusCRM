@@ -9,15 +9,18 @@ import { ChartWrapper, ChartSkeleton, ChartEmpty, ChartError } from "@/component
 import { CustomTooltip } from "@/components/charts/custom-tooltip";
 import { useDealsAnalytics } from "../hooks/use-analytics";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { AnalyticsFilters } from "../types";
 
-// Stage labels + colors that align with design system
-const STAGE_CONFIG: Record<string, { label: string; color: string }> = {
-  LEAD:        { label: "Lead",        color: "hsl(238 76% 65%)" },
-  CONTACTED:   { label: "Contacted",   color: "hsl(262 73% 62%)" },
-  NEGOTIATION: { label: "Negotiation", color: "hsl(43 96% 56%)"  },
-  CLOSED_WON:  { label: "Won",         color: "hsl(142 71% 45%)" },
-  CLOSED_LOST: { label: "Lost",        color: "hsl(0 72% 51%)"   },
+// Stage colors pull from the same pipeline "temperature scale" tokens as
+// the kanban board (see globals.css) — one palette, everywhere a stage
+// is represented.
+const STAGE_COLOR: Record<string, string> = {
+  LEAD:        "hsl(var(--stage-lead))",
+  CONTACTED:   "hsl(var(--stage-contacted))",
+  NEGOTIATION: "hsl(var(--stage-negotiation))",
+  CLOSED_WON:  "hsl(var(--stage-won))",
+  CLOSED_LOST: "hsl(var(--stage-lost))",
 };
 
 interface DealsFunnelChartProps {
@@ -25,14 +28,15 @@ interface DealsFunnelChartProps {
 }
 
 export function DealsFunnelChart({ filters }: DealsFunnelChartProps) {
+  const { t } = useTranslation();
   const { data, isLoading, isError, refetch } = useDealsAnalytics(filters);
 
   if (isLoading) return <ChartSkeleton height={280} />;
 
   return (
     <ChartWrapper
-      title="Deal Pipeline"
-      description="Count and value by stage"
+      title={t("analytics.dealPipeline")}
+      description={t("analytics.countValueByStage")}
       action={
         data && (
           <span
@@ -42,7 +46,7 @@ export function DealsFunnelChart({ filters }: DealsFunnelChartProps) {
               color: "hsl(var(--muted-foreground))",
             }}
           >
-            {data.totalDeals} total
+            {t("analytics.totalSuffix", { count: data.totalDeals })}
           </span>
         )
       }
@@ -51,13 +55,13 @@ export function DealsFunnelChart({ filters }: DealsFunnelChartProps) {
       {isError ? (
         <ChartError onRetry={refetch} />
       ) : !data || data.totalDeals === 0 ? (
-        <ChartEmpty message="No deals to display" />
+        <ChartEmpty message={t("analytics.noDealsToDisplay")} />
       ) : (
         <div className="h-full w-full pt-2">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart
               data={data.stageBreakdown.map((s) => ({
-                name:  STAGE_CONFIG[s.stage]?.label ?? s.stage,
+                name:  t(`deals.stagesShort.${s.stage}`),
                 count: s.count,
                 value: s.totalValue,
                 pct:   s.percentage,
@@ -88,11 +92,11 @@ export function DealsFunnelChart({ filters }: DealsFunnelChartProps) {
                 }
                 cursor={{ fill: "hsl(var(--muted) / 0.4)", radius: 4 }}
               />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Deals" maxBarSize={56}>
+              <Bar dataKey="count" radius={[4, 4, 0, 0]} name={t("analytics.dealsBarName")} maxBarSize={56}>
                 {data.stageBreakdown.map((s) => (
                   <Cell
                     key={s.stage}
-                    fill={STAGE_CONFIG[s.stage]?.color ?? "hsl(var(--primary))"}
+                    fill={STAGE_COLOR[s.stage] ?? "hsl(var(--primary))"}
                     fillOpacity={0.85}
                   />
                 ))}
@@ -106,13 +110,13 @@ export function DealsFunnelChart({ filters }: DealsFunnelChartProps) {
               <div key={s.stage} className="flex items-center gap-1.5">
                 <span
                   className="h-2 w-2 rounded-full"
-                  style={{ background: STAGE_CONFIG[s.stage]?.color }}
+                  style={{ background: STAGE_COLOR[s.stage] }}
                 />
                 <span
                   className="text-xs tabular-nums"
                   style={{ color: "hsl(var(--muted-foreground))" }}
                 >
-                  {STAGE_CONFIG[s.stage]?.label} {s.percentage.toFixed(0)}%
+                  {t(`deals.stages.${s.stage}`)} {s.percentage.toFixed(0)}%
                 </span>
               </div>
             ))}

@@ -89,6 +89,26 @@ export function taskAssignedTemplate(ctx: {
   return baseLayout(content, `Task assigned: ${ctx.taskTitle}`);
 }
 
+export function passwordResetTemplate(ctx: {
+  recipientName: string;
+  resetUrl: string;
+  expiresInMinutes: number;
+}): string {
+  const content = `
+    <h2>Reset your password</h2>
+    <p>Hi ${ctx.recipientName},</p>
+    <p>We received a request to reset the password for your CRM account. Click the button below to choose a new one.</p>
+    <p style="text-align: center; margin: 28px 0;">
+      <a href="${ctx.resetUrl}" style="background: #1e40af; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-weight: 600; font-size: 14px; display: inline-block;">
+        Reset password
+      </a>
+    </p>
+    <p>This link expires in ${ctx.expiresInMinutes} minutes. If you didn't request this, you can safely ignore this email — your password won't be changed.</p>
+    <p style="font-size: 12px; color: #9ca3af;">If the button above doesn't work, copy and paste this URL into your browser:<br/>${ctx.resetUrl}</p>
+  `;
+  return baseLayout(content, 'Reset your CRM password');
+}
+
 export function taskReminderTemplate(ctx: {
   recipientName: string;
   taskTitle: string;

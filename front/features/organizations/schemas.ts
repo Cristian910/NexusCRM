@@ -1,10 +1,11 @@
 import { z } from "zod";
 
-// Mirrors backend UpdateOrganizationDto
+// Mirrors backend UpdateOrganizationDto — message is a translation key,
+// resolved by FormField — see lib/i18n/context.ts#resolveFormMessage.
 export const organizationFormSchema = z.object({
   name: z
     .string()
-    .min(2, "Organization name must be at least 2 characters")
-    .max(100, "Organization name must not exceed 100 characters"),
+    .min(2, "validation.organizationNameMin")
+    .max(100, "validation.organizationNameMax"),
 });
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>;

@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { getRedisOptions } from '@/config/redis-connection.util';
 
 /**
  * RedisCache is a thin, strongly-typed wrapper around ioredis.
@@ -21,9 +22,7 @@ export class RedisCacheService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     this.client = new Redis({
-      host: this.configService.get<string>('queue.redis.host') ?? 'localhost',
-      port: this.configService.get<number>('queue.redis.port') ?? 6379,
-      password: this.configService.get<string>('queue.redis.password') || undefined,
+      ...getRedisOptions(this.configService),
       lazyConnect: true,
       enableReadyCheck: true,
       maxRetriesPerRequest: 1,

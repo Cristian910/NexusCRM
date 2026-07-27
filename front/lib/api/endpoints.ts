@@ -4,6 +4,8 @@ export const ENDPOINTS = {
     register: "/auth/register",
     refresh:  "/auth/refresh",
     logout:   "/auth/logout",
+    forgotPassword: "/auth/forgot-password",
+    resetPassword:  "/auth/reset-password",
     me:       "/users/me",  // /auth/me only returns JWT payload; /users/me returns full SafeUser
   },
   users: {

@@ -1,4 +1,8 @@
-# CRM Backend — Entregable 1: Fundación + Auth + Multi-Tenancy
+# NexusCRM — Backend API
+
+NestJS REST API powering [NexusCRM](../README.md) — multi-tenant auth, deals pipeline, clients, tasks, analytics, and background jobs.
+
+> For deployment (Render + Neon + Upstash) and the project overview, see the [root README](../README.md).
 
 ## Stack
 
@@ -99,6 +103,7 @@ Variables requeridas:
 | `JWT_ACCESS_SECRET` | Secreto para access tokens (mín. 32 chars en prod) |
 | `JWT_REFRESH_SECRET` | Secreto para refresh tokens (mín. 32 chars en prod) |
 | `BCRYPT_ROUNDS` | Rondas bcrypt (recomendado: 12) |
+| `FRONTEND_URL` | Origen del frontend, usado para armar el link del email de reset-password (default: `http://localhost:3000`) |
 
 ### 3. Base de datos
 
@@ -106,12 +111,20 @@ Variables requeridas:
 # Generar cliente Prisma
 npm run prisma:generate
 
-# Ejecutar migraciones
+# Ejecutar migraciones (esto también agrega los campos de reset-password
+# al modelo User — necesario si vienes de una versión anterior del schema)
 npm run prisma:migrate
 
-# (Opcional) Cargar datos iniciales
+# Cargar datos iniciales, incluida la cuenta demo con pipeline completo
 npm run prisma:seed
 ```
+
+El seed crea dos organizaciones:
+
+| Org (slug) | Email | Password | Notas |
+|---|---|---|---|
+| `demo` | `demo@nexuscrm.io` | `Demo1234!` | Cuenta recomendada para explorar — 5 usuarios, 18 clientes, 36 deals distribuidos en todas las etapas, tareas, notificaciones y actividad histórica. Accesible con un click desde "Explore the live demo" en el login. |
+| `acme-corp` | `admin@acme.com` | `Admin1234!` | Organización mínima, vacía, para probar el flujo de onboarding desde cero. |
 
 ### 4. Correr el servidor
 
@@ -147,6 +160,8 @@ Todos los endpoints tienen el prefijo `/api/v1`.
 | POST | `/api/v1/auth/login` | Login: retorna access + refresh token |
 | POST | `/api/v1/auth/refresh` | Renueva access token via refresh token |
 | POST | `/api/v1/auth/logout` | Invalida el refresh token (requiere auth) |
+| POST | `/api/v1/auth/forgot-password` | Solicita link de reseteo de contraseña (rate-limited: 3/min) |
+| POST | `/api/v1/auth/reset-password` | Confirma el nuevo password con el token recibido por email (rate-limited: 5/min) |
 | POST | `/api/v1/auth/me` | Retorna payload del token actual (requiere auth) |
 
 ### Users (requiere auth)

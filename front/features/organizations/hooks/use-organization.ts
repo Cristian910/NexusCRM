@@ -5,6 +5,7 @@ import { organizationsService } from "../organizations.service";
 import type { Organization, UpdateOrganizationPayload } from "../types";
 import type { ApiError } from "@/types";
 import { toast } from "@/lib/stores/toast-store";
+import { t } from "@/lib/i18n/context";
 
 export const orgKeys = {
   me: () => ["organization", "me"] as const,
@@ -25,8 +26,8 @@ export function useUpdateOrganization() {
     mutationFn: organizationsService.update,
     onSuccess: (updated) => {
       qc.setQueryData(orgKeys.me(), updated);
-      toast.success("Organization updated");
+      toast.success(t("toasts.orgUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update organization", err.message),
+    onError: (err) => toast.error(t("toasts.orgUpdateFailed"), err.message),
   });
 }

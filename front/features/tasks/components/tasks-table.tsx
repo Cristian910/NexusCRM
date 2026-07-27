@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, getInitials } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Can } from "@/components/auth/can";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Task } from "../types";
 
 const col = createColumnHelper<Task>();
@@ -39,6 +40,7 @@ interface TasksTableProps {
 }
 
 export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
+  const { t } = useTranslation();
   const [deleteTarget, setDeleteTarget] = React.useState<Task | null>(null);
 
   const completeMut = useCompleteTask();
@@ -48,17 +50,17 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns = useMemo<ColumnDef<Task, any>[]>(() => [
     col.accessor("title", {
-      header: "Task",
+      header: t("tasks.colTask"),
       cell: ({ row }) => {
-        const t = row.original;
+        const task = row.original;
         return (
           <div className="min-w-0 max-w-[260px]">
             <p className="text-sm font-medium truncate" style={{ color: "hsl(var(--foreground))" }}>
-              {t.title}
+              {task.title}
             </p>
-            {t.description && (
+            {task.description && (
               <p className="mt-0.5 text-xs truncate" style={{ color: "hsl(var(--muted-foreground))" }}>
-                {t.description}
+                {task.description}
               </p>
             )}
           </div>
@@ -67,18 +69,18 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
       size: 260,
     }),
     col.accessor("dueDate", {
-      header: "Due",
+      header: t("tasks.colDue"),
       cell: ({ row }) => {
-        const t = row.original;
-        if (!t.dueDate) return <span style={{ color: "hsl(var(--muted-foreground))" }}>—</span>;
-        const overdue = isOverdue(t);
+        const task = row.original;
+        if (!task.dueDate) return <span style={{ color: "hsl(var(--muted-foreground))" }}>—</span>;
+        const overdue = isOverdue(task);
         return (
           <span
             className="inline-flex items-center gap-1 text-sm tabular-nums"
-            style={{ color: overdue ? "hsl(0 72% 60%)" : "hsl(var(--foreground))" }}
+            style={{ color: overdue ? "hsl(var(--destructive))" : "hsl(var(--foreground))" }}
           >
             {overdue && <Clock className="h-3 w-3" />}
-            {formatDate(t.dueDate)}
+            {formatDate(task.dueDate)}
           </span>
         );
       },
@@ -86,10 +88,10 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
     }),
     col.display({
       id: "assignee",
-      header: "Assignee",
+      header: t("tasks.colAssignee"),
       cell: ({ row }) => {
         const a = row.original.assignedTo;
-        if (!a) return <span className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>Unassigned</span>;
+        if (!a) return <span className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>{t("tasks.unassigned")}</span>;
         const name = `${a.firstName} ${a.lastName}`;
         return (
           <div className="flex items-center gap-2">
@@ -104,7 +106,7 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
     }),
     col.display({
       id: "deal",
-      header: "Deal",
+      header: t("tasks.colDeal"),
       cell: ({ row }) => {
         const deal = row.original.deal;
         if (!deal) return <span style={{ color: "hsl(var(--muted-foreground))" }}>—</span>;
@@ -118,13 +120,13 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
       size: 160,
     }),
     col.accessor("status", {
-      header: "Status",
+      header: t("tasks.colStatus"),
       cell: ({ getValue }) => <TaskStatusBadge status={getValue()} />,
       size: 120,
     }),
     col.display({
       id: "actions",
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => <span className="sr-only">{t("tasks.actions")}</span>,
       cell: ({ row }) => (
         <RowActions
           task={row.original}
@@ -137,7 +139,7 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
       size: 56,
     }),
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [onEdit]);
+  ], [onEdit, t]);
 
   const table = useReactTable({
     data,
@@ -201,9 +203,9 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title={`Delete "${deleteTarget?.title}"?`}
-        description="This action cannot be undone. The task will be permanently removed."
-        confirmLabel="Delete permanently"
+        title={t("tasks.deleteTaskTitle", { title: deleteTarget?.title ?? "" })}
+        description={t("tasks.deleteConfirmDescription")}
+        confirmLabel={t("tasks.deletePermanent")}
         onConfirm={() => {
           if (!deleteTarget) return;
           deleteMut.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
@@ -218,6 +220,7 @@ export function TasksTable({ data, isLoading, onEdit }: TasksTableProps) {
 function RowActions({ task, onEdit, onComplete, onCancel, onDelete }: {
   task: Task; onEdit: (t: Task) => void; onComplete: () => void; onCancel: () => void; onDelete: () => void;
 }) {
+  const { t } = useTranslation();
   const active = task.status === "PENDING" || task.status === "IN_PROGRESS";
   return (
     <DropdownMenu>
@@ -226,28 +229,28 @@ function RowActions({ task, onEdit, onComplete, onCancel, onDelete }: {
           variant="ghost"
           size="icon-sm"
           className="opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-          aria-label="Row actions"
+          aria-label={t("tasks.rowActions")}
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">{t("tasks.actions")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <Can permission="tasks.write">
           <DropdownMenuItem onClick={() => onEdit(task)}>
-            <Pencil className="h-3.5 w-3.5" />Edit task
+            <Pencil className="h-3.5 w-3.5" />{t("tasks.editTask")}
           </DropdownMenuItem>
         </Can>
 
         {active && (
           <Can permission="tasks.write">
             <DropdownMenuItem onClick={onComplete}>
-              <CheckCircle2 className="h-3.5 w-3.5" />Mark complete
+              <CheckCircle2 className="h-3.5 w-3.5" />{t("tasks.markComplete")}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onCancel}>
-              <XCircle className="h-3.5 w-3.5" />Cancel task
+              <XCircle className="h-3.5 w-3.5" />{t("tasks.cancelTask")}
             </DropdownMenuItem>
           </Can>
         )}
@@ -256,7 +259,7 @@ function RowActions({ task, onEdit, onComplete, onCancel, onDelete }: {
 
         <Can permission="tasks.delete">
           <DropdownMenuItem destructive onClick={onDelete}>
-            <Trash2 className="h-3.5 w-3.5" />Delete
+            <Trash2 className="h-3.5 w-3.5" />{t("tasks.deleteTask")}
           </DropdownMenuItem>
         </Can>
       </DropdownMenuContent>
@@ -292,11 +295,12 @@ function TableSkeleton() {
 }
 
 function TableEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyState
       icon={ClipboardList}
-      title="No tasks yet"
-      description="Create a task to keep track of follow-ups, calls, and next steps for your deals."
+      title={t("tasks.emptyTitleFirstRun")}
+      description={t("tasks.emptyDescriptionFirstRun")}
     />
   );
 }

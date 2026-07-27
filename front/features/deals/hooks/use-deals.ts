@@ -10,6 +10,7 @@ import type {
 } from "../types";
 import type { ApiError } from "@/types";
 import { toast } from "@/lib/stores/toast-store";
+import { t } from "@/lib/i18n/context";
 
 export const dealKeys = {
   all:    ()         => ["deals"] as const,
@@ -58,9 +59,9 @@ export function useCreateDeal() {
     mutationFn: dealsService.create,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: dealKeys.lists() });
-      toast.success("Deal created");
+      toast.success(t("toasts.dealCreated"));
     },
-    onError: (err) => toast.error("Couldn't create deal", err.message),
+    onError: (err) => toast.error(t("toasts.dealCreateFailed"), err.message),
   });
 }
 
@@ -99,7 +100,7 @@ export function useUpdateDealStage() {
       ctx?.snapshots?.forEach((data, key) => {
         qc.setQueryData(key, data);
       });
-      toast.error("Couldn't move deal", err.message);
+      toast.error(t("toasts.dealMoveFailed"), err.message);
     },
 
     onSettled: () => {
@@ -116,9 +117,9 @@ export function useUpdateDeal() {
     onSuccess: (updated) => {
       qc.setQueryData(dealKeys.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: dealKeys.lists() });
-      toast.success("Deal updated");
+      toast.success(t("toasts.dealUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update deal", err.message),
+    onError: (err) => toast.error(t("toasts.dealUpdateFailed"), err.message),
   });
 }
 
@@ -144,9 +145,9 @@ export function useDeleteDeal() {
       ctx?.snapshots?.forEach((data, key) => {
         qc.setQueryData(key, data);
       });
-      toast.error("Couldn't delete deal", err.message);
+      toast.error(t("toasts.dealDeleteFailed"), err.message);
     },
-    onSuccess: () => toast.success("Deal deleted"),
+    onSuccess: () => toast.success(t("toasts.dealDeleted")),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: dealKeys.lists() });
     },

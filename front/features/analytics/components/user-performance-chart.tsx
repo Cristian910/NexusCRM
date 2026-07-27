@@ -10,6 +10,7 @@ import { CustomTooltip } from "@/components/charts/custom-tooltip";
 import { useUsersAnalytics } from "../hooks/use-analytics";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatCurrency } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { AnalyticsFilters } from "../types";
 
 interface UserPerformanceChartProps {
@@ -17,13 +18,14 @@ interface UserPerformanceChartProps {
 }
 
 export function UserPerformanceChart({ filters }: UserPerformanceChartProps) {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.role === "OWNER" || user?.role === "ADMIN";
   const { data, isLoading, isError, refetch } = useUsersAnalytics(filters);
 
   if (!isAdmin) {
     return (
-      <ChartWrapper title="Team Performance" description="Sales rep leaderboard" height={280}>
+      <ChartWrapper title={t("analytics.teamPerformance")} description={t("analytics.salesRepLeaderboard")} height={280}>
         <div className="flex h-full flex-col items-center justify-center gap-2">
           <div
             className="flex h-10 w-10 items-center justify-center rounded-full"
@@ -40,7 +42,7 @@ export function UserPerformanceChart({ filters }: UserPerformanceChartProps) {
             </svg>
           </div>
           <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
-            Requires Admin or Owner role
+            {t("analytics.requiresAdminRole")}
           </p>
         </div>
       </ChartWrapper>
@@ -62,14 +64,14 @@ export function UserPerformanceChart({ filters }: UserPerformanceChartProps) {
 
   return (
     <ChartWrapper
-      title="Team Performance"
-      description="Won deals and revenue by rep"
+      title={t("analytics.teamPerformance")}
+      description={t("analytics.wonDealsRevenueByRep")}
       action={
         <span
           className="rounded-md px-2 py-1 text-xs font-medium"
           style={{ background: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))" }}
         >
-          {(data ?? []).length} reps
+          {t("analytics.repsSuffix", { count: (data ?? []).length })}
         </span>
       }
       height={280}
@@ -77,7 +79,7 @@ export function UserPerformanceChart({ filters }: UserPerformanceChartProps) {
       {isError ? (
         <ChartError onRetry={refetch} />
       ) : !chartData.length ? (
-        <ChartEmpty message="No user performance data" />
+        <ChartEmpty message={t("analytics.noUserPerformanceData")} />
       ) : (
         <ResponsiveContainer width="100%" height={260}>
           <BarChart
@@ -114,15 +116,15 @@ export function UserPerformanceChart({ filters }: UserPerformanceChartProps) {
             />
             <Bar
               dataKey="total"
-              name="Total deals"
+              name={t("analytics.totalDealsLegend")}
               fill="hsl(var(--muted))"
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
             />
             <Bar
               dataKey="won"
-              name="Won"
-              fill="hsl(142 71% 45%)"
+              name={t("analytics.wonLegend")}
+              fill="hsl(var(--success))"
               fillOpacity={0.85}
               radius={[4, 4, 0, 0]}
               maxBarSize={40}

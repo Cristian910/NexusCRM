@@ -8,6 +8,7 @@ import { clientsService } from "../clients.service";
 import type { ClientFilters, CreateClientPayload, UpdateClientPayload, Client, ClientsPage } from "../types";
 import type { ApiError } from "@/types";
 import { toast } from "@/lib/stores/toast-store";
+import { t } from "@/lib/i18n/context";
 
 // ── Query key factory ─────────────────────────────────────────────
 export const clientKeys = {
@@ -58,9 +59,9 @@ export function useCreateClient() {
       );
       // Background revalidation for accuracy
       qc.invalidateQueries({ queryKey: clientKeys.lists() });
-      toast.success("Client created");
+      toast.success(t("toasts.clientCreated"));
     },
-    onError: (err) => toast.error("Couldn't create client", err.message),
+    onError: (err) => toast.error(t("toasts.clientCreateFailed"), err.message),
   });
 }
 
@@ -85,9 +86,9 @@ export function useUpdateClient() {
           return { ...old, data: old.data.map((c) => (c.id === updated.id ? updated : c)) };
         }
       );
-      toast.success("Client updated");
+      toast.success(t("toasts.clientUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update client", err.message),
+    onError: (err) => toast.error(t("toasts.clientUpdateFailed"), err.message),
   });
 }
 
@@ -100,9 +101,9 @@ export function useArchiveClient() {
     onSuccess: (updated) => {
       qc.setQueryData(clientKeys.detail(updated.id), updated);
       qc.invalidateQueries({ queryKey: clientKeys.lists() });
-      toast.success("Client archived");
+      toast.success(t("toasts.clientArchived"));
     },
-    onError: (err) => toast.error("Couldn't archive client", err.message),
+    onError: (err) => toast.error(t("toasts.clientArchiveFailed"), err.message),
   });
 }
 
@@ -135,9 +136,9 @@ export function useDeleteClient() {
       ctx?.snapshots?.forEach((data, key) => {
         qc.setQueryData(key, data);
       });
-      toast.error("Couldn't delete client", err.message);
+      toast.error(t("toasts.clientDeleteFailed"), err.message);
     },
-    onSuccess: () => toast.success("Client deleted"),
+    onSuccess: () => toast.success(t("toasts.clientDeleted")),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: clientKeys.lists() });
     },

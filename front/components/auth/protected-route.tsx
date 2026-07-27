@@ -8,6 +8,7 @@ import { ShieldOff } from "lucide-react";
 import { usePermissions } from "@/lib/hooks/use-permissions";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Permission } from "@/lib/permissions";
 
 interface ProtectedRouteProps {
@@ -107,6 +108,7 @@ function RouteLoadingState() {
 // ── Access denied inline view ─────────────────────────────────────
 function AccessDeniedView() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <motion.div
@@ -132,14 +134,13 @@ function AccessDeniedView() {
           className="text-lg font-semibold"
           style={{ color: "hsl(var(--foreground))" }}
         >
-          Access restricted
+          {t("common.accessRestricted")}
         </h2>
         <p
           className="mt-1.5 text-sm max-w-[320px]"
           style={{ color: "hsl(var(--muted-foreground))" }}
         >
-          You don&apos;t have the permissions required to view this page.
-          Contact your workspace admin if you think this is a mistake.
+          {t("common.accessRestrictedBody")}
         </p>
       </div>
 
@@ -150,13 +151,13 @@ function AccessDeniedView() {
           size="sm"
           onClick={() => router.back()}
         >
-          Go back
+          {t("common.goBack")}
         </Button>
         <Button
           size="sm"
           onClick={() => router.push("/dashboard")}
         >
-          Dashboard
+          {t("common.dashboard")}
         </Button>
       </div>
     </motion.div>

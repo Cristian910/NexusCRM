@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, getInitials } from "@/components/ui/avatar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Can } from "@/components/auth/can";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Client } from "../types";
 
 const col = createColumnHelper<Client>();
@@ -37,6 +38,7 @@ interface ClientsTableProps {
 
 export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<Client | null>(null);
@@ -50,7 +52,7 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns = useMemo<ColumnDef<Client, any>[]>(() => [
     col.accessor("name", {
-      header: ({ column }) => <SortHeader label="Client" column={column} />,
+      header: ({ column }) => <SortHeader label={t("clients.colClient")} column={column} />,
       cell: ({ row }) => {
         const c = row.original;
         return (
@@ -79,7 +81,7 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
       size: 240,
     }),
     col.accessor("email", {
-      header: "Email",
+      header: t("clients.colEmail"),
       cell: ({ getValue }) => {
         const email = getValue<string | undefined>();
         if (!email) return <span style={{ color: "hsl(var(--muted-foreground))" }}>—</span>;
@@ -92,7 +94,7 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
       size: 200,
     }),
     col.accessor("phone", {
-      header: "Phone",
+      header: t("clients.colPhone"),
       cell: ({ getValue }) => {
         const phone = getValue<string | undefined>();
         return phone
@@ -103,12 +105,12 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
       size: 150,
     }),
     col.accessor("status", {
-      header: "Status",
+      header: t("clients.colStatus"),
       cell: ({ getValue }) => <ClientStatusBadge status={getValue()} />,
       size: 110,
     }),
     col.accessor("createdAt", {
-      header: ({ column }) => <SortHeader label="Created" column={column} />,
+      header: ({ column }) => <SortHeader label={t("clients.colCreated")} column={column} />,
       cell: ({ getValue }) => (
         <span className="text-sm tabular-nums" style={{ color: "hsl(var(--muted-foreground))" }}>
           {formatDate(getValue<string>())}
@@ -118,7 +120,7 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
     }),
     col.display({
       id: "actions",
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => <span className="sr-only">{t("clients.actions")}</span>,
       cell: ({ row }) => (
         <RowActions
           client={row.original}
@@ -131,7 +133,7 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
       enableSorting: false,
     }),
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [onEdit]);
+  ], [onEdit, t]);
 
   const table = useReactTable({
     data,
@@ -196,9 +198,9 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
 
       <ConfirmDialog
         open={!!archiveTarget}
-        title={`Archive ${archiveTarget?.name}?`}
-        description="This client will be marked as archived and hidden from default views. Their deals and data are preserved."
-        confirmLabel="Archive client"
+        title={t("clients.archiveTitle", { name: archiveTarget?.name ?? "" })}
+        description={t("clients.archiveDescription")}
+        confirmLabel={t("clients.archiveConfirm")}
         confirmVariant="default"
         onConfirm={() => {
           if (!archiveTarget) return;
@@ -210,10 +212,10 @@ export function ClientsTable({ data, isLoading, onEdit }: ClientsTableProps) {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title={`Delete ${deleteTarget?.name}?`}
-        description="This action cannot be undone. The client record will be permanently removed."
-        confirmLabel="Delete permanently"
-        warning="Note: clients with associated deals cannot be deleted. Archive them instead."
+        title={t("clients.deleteTitle", { name: deleteTarget?.name ?? "" })}
+        description={t("clients.deleteDescription")}
+        confirmLabel={t("clients.deleteConfirm")}
+        warning={t("clients.deleteWarning")}
         onConfirm={() => {
           if (!deleteTarget) return;
           deleteMut.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
@@ -245,6 +247,7 @@ function RowActions({ client, onEdit, onArchive, onDelete }: {
   client: Client; onEdit: (c: Client) => void; onArchive: () => void; onDelete: () => void;
 }) {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -252,22 +255,22 @@ function RowActions({ client, onEdit, onArchive, onDelete }: {
           variant="ghost"
           size="icon-sm"
           className="opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-          aria-label="Row actions"
+          aria-label={t("clients.rowActions")}
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuLabel className="text-xs">Actions</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">{t("clients.actions")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push(`/clients/${client.id}`)}>
-          <ExternalLink className="h-3.5 w-3.5" />View details
+          <ExternalLink className="h-3.5 w-3.5" />{t("clients.viewDetails")}
         </DropdownMenuItem>
 
         {/* Edit — requires clients.write */}
         <Can permission="clients.write">
           <DropdownMenuItem onClick={() => onEdit(client)}>
-            <Pencil className="h-3.5 w-3.5" />Edit client
+            <Pencil className="h-3.5 w-3.5" />{t("clients.editClient")}
           </DropdownMenuItem>
         </Can>
 
@@ -277,7 +280,7 @@ function RowActions({ client, onEdit, onArchive, onDelete }: {
         <Can permission="clients.archive">
           {client.status !== "ARCHIVED" && (
             <DropdownMenuItem onClick={onArchive}>
-              <Archive className="h-3.5 w-3.5" />Archive
+              <Archive className="h-3.5 w-3.5" />{t("clients.archive")}
             </DropdownMenuItem>
           )}
         </Can>
@@ -285,7 +288,7 @@ function RowActions({ client, onEdit, onArchive, onDelete }: {
         {/* Delete — requires clients.delete */}
         <Can permission="clients.delete">
           <DropdownMenuItem destructive onClick={onDelete}>
-            <Trash2 className="h-3.5 w-3.5" />Delete
+            <Trash2 className="h-3.5 w-3.5" />{t("clients.delete")}
           </DropdownMenuItem>
         </Can>
       </DropdownMenuContent>
@@ -321,11 +324,12 @@ function TableSkeleton() {
 }
 
 function TableEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyState
       icon={Building2}
-      title="No clients found"
-      description="Try adjusting your search or filters — or add your first client to get started."
+      title={t("clients.emptyTitle")}
+      description={t("clients.emptyDescription")}
     />
   );
 }

@@ -12,22 +12,24 @@ import { ProfileTab } from "@/features/settings/components/profile-tab";
 import { OrganizationTab } from "@/features/settings/components/organization-tab";
 import { TeamTab } from "@/features/settings/components/team-tab";
 import { usePermissions } from "@/lib/hooks/use-permissions";
-
-const ALL_TABS: (TabItem & { requires?: "organization.manage" | "users.read" })[] = [
-  { value: "profile",      label: "Profile",      icon: User      },
-  { value: "organization", label: "Organization", icon: Building2, requires: "organization.manage" },
-  { value: "team",         label: "Team",         icon: Users,     requires: "users.read" },
-];
+import { useTranslation } from "@/lib/i18n/context";
 
 export function SettingsClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const { can } = usePermissions();
+  const { t } = useTranslation();
 
-  const tabs = ALL_TABS.filter((t) => !t.requires || can(t.requires));
+  const allTabs: (TabItem & { requires?: "organization.manage" | "users.read" })[] = [
+    { value: "profile",      label: t("settings.tabProfile"),      icon: User      },
+    { value: "organization", label: t("settings.tabOrganization"), icon: Building2, requires: "organization.manage" },
+    { value: "team",         label: t("settings.tabTeam"),         icon: Users,     requires: "users.read" },
+  ];
+
+  const tabs = allTabs.filter((tabItem) => !tabItem.requires || can(tabItem.requires));
   const requested = searchParams.get("tab");
-  const activeTab = tabs.some((t) => t.value === requested) ? requested! : tabs[0].value;
+  const activeTab = tabs.some((tabItem) => tabItem.value === requested) ? requested! : tabs[0].value;
 
   const [tab, setTab] = useState(activeTab);
 
@@ -40,7 +42,7 @@ export function SettingsClient() {
     <ProtectedRoute permission="settings.read">
       <div className="space-y-5 pb-8">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <PageHeader title="Settings" description="Manage your account, organization, and team" />
+          <PageHeader title={t("settings.pageTitle")} description={t("settings.pageDescription")} />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.04 }}>

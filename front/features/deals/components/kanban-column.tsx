@@ -9,6 +9,7 @@ import { DealCard } from "./deal-card";
 import { formatCurrency } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { Can } from "@/components/auth/can";
+import { useTranslation } from "@/lib/i18n/context";
 import type { KanbanColumn as KanbanColumnType, Deal } from "../types";
 
 interface KanbanColumnProps {
@@ -19,6 +20,8 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ column, isOver, onDealClick, onAddDeal }: KanbanColumnProps) {
+  const { t } = useTranslation();
+  const label = t(`deals.stages.${column.stage}`);
   const { setNodeRef } = useDroppable({
     id: column.stage,
     data: { type: "column", stage: column.stage },
@@ -41,7 +44,7 @@ export function KanbanColumn({ column, isOver, onDealClick, onAddDeal }: KanbanC
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full" style={{ background: column.color }} />
           <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(var(--foreground))" }}>
-            {column.label}
+            {label}
           </span>
           <span
             className="rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums"
@@ -57,7 +60,7 @@ export function KanbanColumn({ column, isOver, onDealClick, onAddDeal }: KanbanC
             onClick={() => onAddDeal(column.stage)}
             className="rounded-md p-1 transition-colors"
             style={{ color: "hsl(var(--muted-foreground))" }}
-            aria-label={`Add deal to ${column.label}`}
+            aria-label={t("deals.addDealTo", { stage: label })}
           >
             <Plus className="h-3.5 w-3.5" />
           </button>
@@ -92,7 +95,7 @@ export function KanbanColumn({ column, isOver, onDealClick, onAddDeal }: KanbanC
                 }}
               >
                 <p className="text-[11px]" style={{ color: isOver ? column.color : "hsl(var(--muted-foreground))" }}>
-                  {isOver ? "Drop here" : "No deals"}
+                  {isOver ? t("deals.dropHere") : t("deals.noDeals")}
                 </p>
               </motion.div>
             ) : (

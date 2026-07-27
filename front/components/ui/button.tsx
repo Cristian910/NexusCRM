@@ -9,7 +9,7 @@ const buttonVariants = cva(
   // Base
   [
     "inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "text-sm font-medium",
+    "text-sm font-semibold tracking-[-0.01em]",
     "rounded-md",
     "transition-all duration-150",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
@@ -21,7 +21,7 @@ const buttonVariants = cva(
       variant: {
         default: [
           "bg-primary text-primary-foreground",
-          "hover:bg-primary/90 active:bg-primary/80",
+          "hover:bg-primary/90 hover:shadow-glow active:bg-primary/80",
           "shadow-sm",
         ],
         destructive: [
@@ -30,7 +30,7 @@ const buttonVariants = cva(
         ],
         outline: [
           "border border-border bg-transparent text-foreground",
-          "hover:bg-accent hover:text-accent-foreground",
+          "hover:bg-accent hover:text-accent-foreground hover:border-primary/40",
           "active:bg-accent/80",
         ],
         secondary: [
@@ -38,12 +38,12 @@ const buttonVariants = cva(
           "hover:bg-secondary/80 active:bg-secondary/70",
         ],
         ghost: [
-          "bg-transparent text-foreground",
+          "bg-transparent text-foreground font-medium",
           "hover:bg-accent hover:text-accent-foreground",
           "active:bg-accent/80",
         ],
         link: [
-          "text-primary underline-offset-4",
+          "text-primary underline-offset-4 font-medium",
           "hover:underline",
           "p-0 h-auto",
         ],

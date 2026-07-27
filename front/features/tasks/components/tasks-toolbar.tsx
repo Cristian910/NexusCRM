@@ -9,14 +9,10 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { Can } from "@/components/auth/can";
+import { useTranslation } from "@/lib/i18n/context";
 import type { TaskStatus } from "../types";
 
-const STATUS_OPTIONS: { label: string; value: TaskStatus }[] = [
-  { label: "Pending",     value: "PENDING"     },
-  { label: "In progress", value: "IN_PROGRESS" },
-  { label: "Completed",   value: "COMPLETED"   },
-  { label: "Cancelled",   value: "CANCELLED"   },
-];
+const STATUS_VALUES: TaskStatus[] = ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
 
 interface TasksToolbarProps {
   statusFilter: TaskStatus | undefined;
@@ -32,6 +28,7 @@ export function TasksToolbar({
   statusFilter, onStatusChange, assignedToMe, onAssignedToMeChange,
   totalCount, isLoading, onCreate,
 }: TasksToolbarProps) {
+  const { t } = useTranslation();
   const hasFilters = !!statusFilter || assignedToMe;
 
   return (
@@ -46,19 +43,19 @@ export function TasksToolbar({
             style={statusFilter ? { borderColor: "hsl(var(--primary))", color: "hsl(var(--primary))" } : {}}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            {statusFilter ? STATUS_OPTIONS.find((s) => s.value === statusFilter)?.label : "Status"}
+            {statusFilter ? t(`tasks.status.${statusFilter}`) : t("tasks.statusFilterLabel")}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-44">
-          <DropdownMenuLabel>Filter by status</DropdownMenuLabel>
+          <DropdownMenuLabel>{t("tasks.filterByStatus")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {STATUS_OPTIONS.map(({ label, value }) => (
+          {STATUS_VALUES.map((value) => (
             <DropdownMenuCheckboxItem
               key={value}
               checked={statusFilter === value}
               onCheckedChange={(checked) => onStatusChange(checked ? value : undefined)}
             >
-              {label}
+              {t(`tasks.status.${value}`)}
             </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuContent>
@@ -74,7 +71,7 @@ export function TasksToolbar({
         aria-pressed={assignedToMe}
       >
         <UserCheck className="h-3.5 w-3.5" />
-        Assigned to me
+        {t("tasks.assignedToMe")}
       </Button>
 
       {/* Clear filters */}
@@ -94,7 +91,7 @@ export function TasksToolbar({
               onClick={() => { onStatusChange(undefined); onAssignedToMeChange(false); }}
               style={{ color: "hsl(var(--muted-foreground))" }}
             >
-              <X className="h-3 w-3" /> Clear
+              <X className="h-3 w-3" /> {t("tasks.clear")}
             </Button>
           </motion.div>
         )}
@@ -112,7 +109,9 @@ export function TasksToolbar({
             className="text-xs tabular-nums hidden sm:block"
             style={{ color: "hsl(var(--muted-foreground))" }}
           >
-            {totalCount.toLocaleString()} task{totalCount !== 1 ? "s" : ""}
+            {totalCount === 1
+              ? t("tasks.taskCountSingular", { count: totalCount })
+              : t("tasks.taskCountPlural", { count: totalCount })}
           </motion.span>
         )}
       </AnimatePresence>
@@ -120,7 +119,7 @@ export function TasksToolbar({
       <Can permission="tasks.write">
         <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={onCreate}>
           <Plus className="h-3.5 w-3.5" />
-          New task
+          {t("tasks.newTask")}
         </Button>
       </Can>
     </div>

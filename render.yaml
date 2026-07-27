@@ -1,0 +1,66 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploys the NestJS API as a free Web Service. The database and Redis are
+# NOT provisioned here on purpose: Render's own free Postgres expires after
+# 30 days and gets deleted, so this project uses Neon (Postgres) and Upstash
+# (Redis) instead — both have a genuinely permanent free tier. Create those
+# separately (neon.tech / upstash.com) and paste their connection strings
+# into the Render dashboard for the env vars marked `sync: false` below.
+#
+# To deploy: push this repo to GitHub, then in Render → New → Blueprint,
+# point it at the repo. Render will read this file automatically.
+
+services:
+  - type: web
+    name: nexuscrm-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: back
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && npm run start:prod
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: BCRYPT_ROUNDS
+        value: 12
+      - key: THROTTLE_TTL
+        value: 60000
+      - key: THROTTLE_LIMIT
+        value: 10
+      - key: TASK_REMINDER_HOURS_BEFORE
+        value: 24
+      - key: ANALYTICS_CACHE_TTL
+        value: 300
+      - key: ANALYTICS_CACHE_OVERVIEW_TTL
+        value: 60
+      # ── Secrets & per-environment values — set these in the Render
+      # dashboard after the first deploy (Render will prompt for them) ──
+      - key: DATABASE_URL          # Neon connection string (see README)
+        sync: false
+      - key: REDIS_URL             # Upstash rediss:// connection string
+        sync: false
+      - key: JWT_ACCESS_SECRET     # generate: openssl rand -base64 48
+        sync: false
+      - key: JWT_REFRESH_SECRET    # generate: openssl rand -base64 48 (different value)
+        sync: false
+      - key: FRONTEND_URL          # your Vercel URL, e.g. https://your-app.vercel.app
+        sync: false
+      - key: CORS_ORIGIN           # same as FRONTEND_URL
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM_NAME
+        sync: false
+      - key: EMAIL_FROM_ADDRESS
+        sync: false

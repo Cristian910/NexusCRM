@@ -1,34 +1,37 @@
 import { z } from "zod";
 
+// Messages are translation keys, resolved by FormField —
+// see lib/i18n/context.ts#resolveFormMessage.
+
 // Mirrors backend UpdateUserDto
 export const profileFormSchema = z.object({
   firstName: z
     .string()
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters"),
+    .min(2, "validation.firstNameMin")
+    .max(50, "validation.firstNameMax"),
   lastName: z
     .string()
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters"),
+    .min(2, "validation.lastNameMin")
+    .max(50, "validation.lastNameMax"),
 });
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 // Mirrors backend ChangePasswordDto — same strength rule as registration
 export const passwordFormSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required"),
+    currentPassword: z.string().min(1, "validation.currentPasswordRequired"),
     newPassword: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(64, "Password must not exceed 64 characters")
+      .min(8, "validation.passwordMinLength")
+      .max(64, "validation.passwordMaxLength")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-        "Must include uppercase, lowercase, number, and special character (@$!%*?&)"
+        "validation.passwordComplexity"
       ),
-    confirmPassword: z.string().min(1, "Please confirm your new password"),
+    confirmPassword: z.string().min(1, "validation.confirmNewPasswordRequired"),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
-    message: "Passwords do not match",
+    message: "validation.passwordsDoNotMatch",
     path: ["confirmPassword"],
   });
 export type PasswordFormValues = z.infer<typeof passwordFormSchema>;
@@ -37,17 +40,17 @@ export type PasswordFormValues = z.infer<typeof passwordFormSchema>;
 export const inviteFormSchema = z.object({
   email: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
+    .min(1, "validation.emailRequired")
+    .email("validation.emailInvalid")
     .transform((v) => v.toLowerCase().trim()),
   firstName: z
     .string()
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must not exceed 50 characters"),
+    .min(2, "validation.firstNameMin")
+    .max(50, "validation.firstNameMax"),
   lastName: z
     .string()
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must not exceed 50 characters"),
+    .min(2, "validation.lastNameMin")
+    .max(50, "validation.lastNameMax"),
   role: z.enum(["ADMIN", "MEMBER", "VIEWER"]),
 });
 export type InviteFormValues = z.infer<typeof inviteFormSchema>;

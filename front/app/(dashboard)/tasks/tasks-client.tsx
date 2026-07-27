@@ -12,11 +12,13 @@ import { Pagination } from "@/components/ui/pagination";
 import { useTasks } from "@/features/tasks/hooks/use-tasks";
 import { usePermissions } from "@/lib/hooks/use-permissions";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Task, TaskStatus } from "@/features/tasks/types";
 
 const LIMIT = 20;
 
 export function TasksClient() {
+  const { t } = useTranslation();
   const [statusFilter, setStatus]     = useState<TaskStatus | undefined>();
   const [assignedToMe, setAssignedToMe] = useState(false);
   const [page, setPage]               = useState(1);
@@ -49,7 +51,7 @@ export function TasksClient() {
     <ProtectedRoute permission="tasks.read">
       <div className="space-y-4 pb-8">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-          <PageHeader title="Tasks" description="Follow-ups, calls, and next steps across your pipeline" />
+          <PageHeader title={t("tasks.pageTitle")} description={t("tasks.pageDescription")} />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2, delay: 0.04 }}>
@@ -72,7 +74,7 @@ export function TasksClient() {
             style={{ borderColor: "hsl(var(--destructive) / 0.3)", background: "hsl(var(--destructive) / 0.07)", color: "hsl(var(--destructive))" }}
           >
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{error?.message ?? "Failed to load tasks."}</span>
+            <span>{error?.message ?? t("common.somethingWrong")}</span>
           </motion.div>
         )}
 
@@ -93,7 +95,7 @@ export function TasksClient() {
               limit={LIMIT}
               onPageChange={setPage}
               isLoading={isLoading}
-              itemLabel="tasks"
+              itemLabel={t("common.items")}
             />
           </motion.div>
         )}

@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 import { useActivity } from "../hooks/use-activity";
-import { ACTIVITY_CONFIG, ENTITY_TYPE_CONFIG } from "./activity-config";
+import { ACTIVITY_CONFIG } from "./activity-config";
 import { formatRelative, formatDate } from "@/lib/utils";
 import { Avatar, AvatarFallback, getInitials } from "@/components/ui/avatar";
+import { useTranslation } from "@/lib/i18n/context";
 import type { ActivityFilters, Activity } from "@/types/activity";
 
 interface ActivityTableProps {
@@ -15,6 +16,7 @@ interface ActivityTableProps {
 }
 
 export function ActivityTable({ filters }: ActivityTableProps) {
+  const { t } = useTranslation();
   const { data, isLoading } = useActivity(filters);
   const activities = data?.data ?? [];
 
@@ -32,10 +34,10 @@ export function ActivityTable({ filters }: ActivityTableProps) {
           color: "hsl(var(--muted-foreground))",
         }}
       >
-        <span>User</span>
-        <span>Action</span>
-        <span>Entity</span>
-        <span className="text-right">When</span>
+        <span>{t("activity.colUser")}</span>
+        <span>{t("activity.colAction")}</span>
+        <span>{t("activity.colEntity")}</span>
+        <span className="text-right">{t("activity.colWhen")}</span>
       </div>
 
       {/* Rows */}
@@ -50,11 +52,11 @@ export function ActivityTable({ filters }: ActivityTableProps) {
 
 function ActivityRow({ activity, index }: { activity: Activity; index: number }) {
   const router = useRouter();
+  const { t } = useTranslation();
   const cfg = ACTIVITY_CONFIG[activity.type];
-  const entityCfg = ENTITY_TYPE_CONFIG[activity.entityType];
   const userName = activity.user
     ? `${activity.user.firstName} ${activity.user.lastName}`
-    : "System";
+    : t("activity.system");
 
   const handleNavigate = () => {
     router.push(cfg.entityRoute(activity.entityId));
@@ -88,7 +90,7 @@ function ActivityRow({ activity, index }: { activity: Activity; index: number })
             className="text-xs font-medium"
             style={{ color: cfg?.color ?? "hsl(var(--foreground))" }}
           >
-            {cfg?.label ?? activity.type}
+            {t(`activity.types.${activity.type}`)}
           </span>
           {activity.metadata && Object.keys(activity.metadata).length > 0 && (
             <MetadataHint type={activity.type} metadata={activity.metadata} />
@@ -105,12 +107,12 @@ function ActivityRow({ activity, index }: { activity: Activity; index: number })
             color: cfg?.color ?? "hsl(var(--muted-foreground))",
           }}
         >
-          {entityCfg?.label ?? activity.entityType}
+          {t(`activity.entitySingular.${activity.entityType}`)}
         </span>
         <button
           onClick={handleNavigate}
           className="opacity-0 transition-opacity group-hover:opacity-100"
-          aria-label="Go to entity"
+          aria-label={t("activity.goToEntity")}
         >
           <ExternalLink
             className="h-3 w-3"
@@ -140,11 +142,11 @@ function MetadataHint({
   type: Activity["type"];
   metadata: Record<string, unknown>;
 }) {
+  const { t } = useTranslation();
   if (type === "DEAL_STAGE_CHANGED" && metadata.fromStage && metadata.toStage) {
     return (
       <p className="mt-0.5 text-[10px]" style={{ color: "hsl(var(--muted-foreground))" }}>
-        {String(metadata.fromStage).replace("_", " ")} →{" "}
-        {String(metadata.toStage).replace("_", " ")}
+        {t(`deals.stages.${metadata.fromStage}`)} → {t(`deals.stages.${metadata.toStage}`)}
       </p>
     );
   }
@@ -179,6 +181,7 @@ function ActivitySkeleton() {
 }
 
 function ActivityEmpty() {
+  const { t } = useTranslation();
   return (
     <div
       className="flex flex-col items-center justify-center gap-3 rounded-xl border py-16"
@@ -192,10 +195,10 @@ function ActivityEmpty() {
       </div>
       <div className="text-center">
         <p className="text-sm font-medium" style={{ color: "hsl(var(--foreground))" }}>
-          No activity yet
+          {t("activity.emptyTitle")}
         </p>
         <p className="mt-0.5 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-          Actions across your CRM will appear here
+          {t("activity.emptyDescription")}
         </p>
       </div>
     </div>

@@ -4,10 +4,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "NexusCRM",
+    default: "NexusCRM — Modern CRM for small sales teams",
     template: "%s · NexusCRM",
   },
-  description: "Professional CRM for modern teams",
+  description: "Clients, deals, tasks, and analytics in one place. A full-stack CRM built with Next.js and NestJS.",
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="es" className="dark" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>

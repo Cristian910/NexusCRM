@@ -19,6 +19,11 @@ class EnvironmentVariables {
   @IsString()
   DATABASE_URL: string;
 
+  // Used to build absolute links in outbound emails (password reset, etc).
+  @IsOptional()
+  @IsString()
+  FRONTEND_URL: string = 'http://localhost:3000';
+
   @IsString()
   JWT_ACCESS_SECRET: string;
 
@@ -30,7 +35,13 @@ class EnvironmentVariables {
   @Max(14)
   BCRYPT_ROUNDS: number = 12;
 
-  // Redis — optional in development (queues degrade gracefully)
+  // Redis — optional in development (queues degrade gracefully).
+  // Set REDIS_URL for managed providers (Upstash, Redis Cloud, etc.) — it
+  // takes priority over HOST/PORT/PASSWORD when present. See redis-connection.util.ts.
+  @IsOptional()
+  @IsString()
+  REDIS_URL?: string;
+
   @IsOptional()
   @IsString()
   REDIS_HOST: string = 'localhost';

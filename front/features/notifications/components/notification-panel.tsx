@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, SlidersHorizontal, Inbox } from "lucide-react";
 import { NotificationItem } from "./notification-item";
 import { useNotifications, useMarkAllAsRead } from "../hooks/use-notifications";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface NotificationPanelProps {
   open: boolean;
@@ -15,6 +17,8 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
+  const { t } = useTranslation();
+  const router = useRouter();
   const [unreadOnly, setUnreadOnly] = useState(false);
   const { data, isLoading } = useNotifications({ unreadOnly, limit: 30 });
   const markAllRead = useMarkAllAsRead();
@@ -59,7 +63,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                 className="text-sm font-semibold"
                 style={{ color: "hsl(var(--foreground))" }}
               >
-                Notifications
+                {t("notifications.pageTitle")}
               </h3>
 
               <div className="flex items-center gap-1">
@@ -73,7 +77,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                   }}
                 >
                   <SlidersHorizontal className="h-3 w-3" />
-                  Unread
+                  {t("notifications.unread")}
                 </button>
 
                 {/* Mark all read */}
@@ -86,7 +90,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                   style={{ color: "hsl(var(--muted-foreground))" }}
                 >
                   <Check className="h-3 w-3" />
-                  All read
+                  {t("notifications.allRead")}
                 </Button>
               </div>
             </div>
@@ -118,11 +122,11 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
               style={{ borderColor: "hsl(var(--border))" }}
             >
               <button
-                onClick={() => { onClose(); }}
+                onClick={() => { onClose(); router.push("/notifications"); }}
                 className="w-full text-center text-xs transition-colors"
                 style={{ color: "hsl(var(--primary))" }}
               >
-                View all notifications →
+                {t("notifications.viewAll")}
               </button>
             </div>
           </motion.div>
@@ -150,6 +154,7 @@ function PanelSkeleton() {
 }
 
 function PanelEmpty({ unreadOnly }: { unreadOnly: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-10">
       <div
@@ -159,7 +164,7 @@ function PanelEmpty({ unreadOnly }: { unreadOnly: boolean }) {
         <Inbox className="h-5 w-5" style={{ color: "hsl(var(--muted-foreground))" }} />
       </div>
       <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
-        {unreadOnly ? "No unread notifications" : "You're all caught up"}
+        {unreadOnly ? t("notifications.noUnread") : t("notifications.allCaughtUpShort")}
       </p>
     </div>
   );

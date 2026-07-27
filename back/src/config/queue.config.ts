@@ -2,6 +2,11 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('queue', () => ({
   redis: {
+    // Upstash (and most managed Redis providers) issue a single connection
+    // string like rediss://default:PASSWORD@host:port — the "rediss:" scheme
+    // is what tells ioredis/BullMQ to negotiate TLS. When REDIS_URL is set it
+    // always wins; HOST/PORT/PASSWORD remain as the local-dev fallback.
+    url: process.env.REDIS_URL || undefined,
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379', 10),
     password: process.env.REDIS_PASSWORD || undefined,

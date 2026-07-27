@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { STAGE_CONFIG, ORDERED_STAGES } from "./kanban-config";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 import type { Deal } from "../types";
 
 interface DealDrawerProps {
@@ -20,6 +21,7 @@ interface DealDrawerProps {
 }
 
 export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
+  const { t } = useTranslation();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { data: deal, isLoading } = useDeal(dealId ?? "");
   const deleteMut = useDeleteDeal();
@@ -70,7 +72,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                 style={{ borderColor: "hsl(var(--border))" }}
               >
                 <h2 className="text-sm font-semibold" style={{ color: "hsl(var(--foreground))" }}>
-                  Deal Details
+                  {t("deals.dealDetails")}
                 </h2>
                 <div className="flex items-center gap-1">
                   {deal && (
@@ -79,7 +81,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => { onEdit(deal); onClose(); }}
-                        aria-label="Edit deal"
+                        aria-label={t("deals.editDeal")}
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
@@ -87,14 +89,14 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                         variant="ghost"
                         size="icon-sm"
                         onClick={() => setConfirmDelete(true)}
-                        aria-label="Delete deal"
+                        aria-label={t("deals.deleteDeal")}
                         style={{ color: "hsl(var(--destructive))" }}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </>
                   )}
-                  <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close">
+                  <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t("common.close")}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -106,7 +108,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                   <DrawerSkeleton />
                 ) : !deal ? (
                   <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
-                    Deal not found.
+                    {t("deals.dealNotFound")}
                   </p>
                 ) : (
                   <>
@@ -127,7 +129,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                             color: cfg?.color,
                           }}
                         >
-                          {cfg?.label}
+                          {t(`deals.stages.${deal.stage}`)}
                         </span>
                       </div>
                     </div>
@@ -136,27 +138,27 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                     <div className="grid grid-cols-2 gap-3">
                       <Metric
                         icon={<DollarSign className="h-3.5 w-3.5" />}
-                        label="Value"
+                        label={t("deals.value")}
                         value={formatCurrency(deal.value ?? 0)}
                         emphasis
                       />
                       {deal.probability !== undefined && (
                         <Metric
                           icon={<TrendingUp className="h-3.5 w-3.5" />}
-                          label="Probability"
+                          label={t("deals.probability")}
                           value={`${deal.probability}%`}
                         />
                       )}
                       {deal.expectedCloseDate && (
                         <Metric
                           icon={<Calendar className="h-3.5 w-3.5" />}
-                          label="Expected close"
+                          label={t("deals.expectedClose")}
                           value={formatDate(deal.expectedCloseDate, "MMM d, yyyy")}
                         />
                       )}
                       <Metric
                         icon={<Calendar className="h-3.5 w-3.5" />}
-                        label="Created"
+                        label={t("deals.created")}
                         value={formatDate(deal.createdAt, "MMM d, yyyy")}
                       />
                     </div>
@@ -174,7 +176,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                           className="text-[10px] font-semibold uppercase tracking-wider"
                           style={{ color: "hsl(var(--muted-foreground))" }}
                         >
-                          Client
+                          {t("deals.client")}
                         </p>
                         <div className="flex items-center gap-2">
                           <User className="h-3.5 w-3.5 shrink-0" style={{ color: "hsl(var(--muted-foreground))" }} />
@@ -208,7 +210,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                         className="mb-2.5 text-[10px] font-semibold uppercase tracking-wider"
                         style={{ color: "hsl(var(--muted-foreground))" }}
                       >
-                        Pipeline progress
+                        {t("deals.pipelineProgress")}
                       </p>
                       <div className="flex items-center gap-1">
                         {ORDERED_STAGES.map((s, i) => {
@@ -232,7 +234,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                                     : "hsl(var(--muted-foreground))",
                                 }}
                               >
-                                {stageCfg.label.slice(0, 4)}
+                                {t(`deals.stagesShort.${s}`)}
                               </div>
                               {i < ORDERED_STAGES.length - 1 && (
                                 <ArrowRight
@@ -254,7 +256,7 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
                           style={{ color: "hsl(var(--muted-foreground))" }}
                         >
                           <FileText className="h-3 w-3" />
-                          Notes
+                          {t("deals.notes")}
                         </p>
                         <p
                           className="text-sm leading-relaxed whitespace-pre-wrap"
@@ -274,9 +276,9 @@ export function DealDrawer({ dealId, onClose, onEdit }: DealDrawerProps) {
 
       <ConfirmDialog
         open={confirmDelete}
-        title={`Delete "${deal?.title}"?`}
-        description="This deal will be permanently removed. This action cannot be undone."
-        confirmLabel="Delete deal"
+        title={t("deals.deleteDealTitle", { title: deal?.title ?? "" })}
+        description={t("deals.deleteDealDescription")}
+        confirmLabel={t("deals.deleteDeal")}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
         isLoading={deleteMut.isPending}
@@ -304,7 +306,7 @@ function Metric({ icon, label, value, emphasis }: {
         </span>
       </div>
       <p
-        className="text-sm font-semibold tabular-nums"
+        className="font-mono text-sm font-semibold tabular-nums"
         style={{
           color: emphasis ? "hsl(var(--primary))" : "hsl(var(--foreground))",
         }}

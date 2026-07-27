@@ -7,9 +7,14 @@ import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtAccessGuard } from './guards/jwt-access.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { QueuesModule } from '@/queues/queues.module';
 
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: 'jwt-access' }), JwtModule.register({})],
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt-access' }),
+    JwtModule.register({}),
+    QueuesModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtAccessStrategy, JwtRefreshStrategy, JwtAccessGuard, RolesGuard],
   exports: [AuthService, JwtAccessGuard, RolesGuard],

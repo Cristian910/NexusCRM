@@ -14,6 +14,7 @@ import { PasswordInput } from "@/features/auth/components/password-input";
 import { profileFormSchema, passwordFormSchema, type ProfileFormValues, type PasswordFormValues } from "@/features/users/schemas";
 import { useUpdateProfile, useChangePassword } from "@/features/users/hooks/use-users";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function ProfileTab() {
   const user = useAuthStore((s) => s.user);
@@ -46,6 +47,7 @@ export function ProfileTab() {
 }
 
 function ProfileForm() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const updateMut = useUpdateProfile();
 
@@ -59,7 +61,7 @@ function ProfileForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <UserIcon className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
-          Personal information
+          {t("settings.personalInfo")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -70,13 +72,13 @@ function ProfileForm() {
         >
           <div className="grid gap-3 sm:grid-cols-2">
             <FormField
-              label="First name"
+              label={t("settings.firstName")}
               error={errors.firstName?.message}
               disabled={updateMut.isPending}
               {...register("firstName")}
             />
             <FormField
-              label="Last name"
+              label={t("settings.lastName")}
               error={errors.lastName?.message}
               disabled={updateMut.isPending}
               {...register("lastName")}
@@ -84,7 +86,7 @@ function ProfileForm() {
           </div>
           <div className="flex justify-end">
             <Button type="submit" size="sm" loading={updateMut.isPending} disabled={!isDirty || updateMut.isPending}>
-              Save changes
+              {t("settings.saveChanges")}
             </Button>
           </div>
         </form>
@@ -94,6 +96,7 @@ function ProfileForm() {
 }
 
 function PasswordCard() {
+  const { t } = useTranslation();
   const changeMut = useChangePassword();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
@@ -105,7 +108,7 @@ function PasswordCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <KeyRound className="h-4 w-4" style={{ color: "hsl(var(--muted-foreground))" }} />
-          Password
+          {t("settings.password")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -120,20 +123,20 @@ function PasswordCard() {
           noValidate
         >
           <PasswordInput
-            label="Current password"
+            label={t("settings.currentPassword")}
             error={errors.currentPassword?.message}
             disabled={changeMut.isPending}
             {...register("currentPassword")}
           />
           <div className="grid gap-3 sm:grid-cols-2">
             <PasswordInput
-              label="New password"
+              label={t("settings.newPassword")}
               error={errors.newPassword?.message}
               disabled={changeMut.isPending}
               {...register("newPassword")}
             />
             <PasswordInput
-              label="Confirm new password"
+              label={t("settings.confirmNewPassword")}
               error={errors.confirmPassword?.message}
               disabled={changeMut.isPending}
               {...register("confirmPassword")}
@@ -141,7 +144,7 @@ function PasswordCard() {
           </div>
           <div className="flex justify-end">
             <Button type="submit" size="sm" loading={changeMut.isPending} disabled={changeMut.isPending}>
-              Update password
+              {t("settings.updatePassword")}
             </Button>
           </div>
         </form>
@@ -151,20 +154,21 @@ function PasswordCard() {
 }
 
 function AppearanceCard() {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Appearance</CardTitle>
+        <CardTitle className="text-sm">{t("settings.appearance")}</CardTitle>
       </CardHeader>
       <CardContent className="flex items-center justify-between">
         <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
-          Choose how NexusCRM looks on this device.
+          {t("settings.appearanceDescription")}
         </p>
         <div className="flex items-center gap-1 rounded-md border p-1" style={{ borderColor: "hsl(var(--border))" }}>
-          <ThemeOption active={theme === "dark"} icon={Moon} label="Dark" onClick={() => setTheme("dark")} />
-          <ThemeOption active={theme === "light"} icon={Sun} label="Light" onClick={() => setTheme("light")} />
+          <ThemeOption active={theme === "dark"} icon={Moon} label={t("settings.dark")} onClick={() => setTheme("dark")} />
+          <ThemeOption active={theme === "light"} icon={Sun} label={t("settings.light")} onClick={() => setTheme("light")} />
         </div>
       </CardContent>
     </Card>

@@ -6,7 +6,9 @@ import { authService } from "../auth.service";
 import { tokenStore } from "@/lib/api/token-store";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { queryKeys } from "@/lib/api/query-keys";
-import type { ApiError, LoginPayload, RegisterPayload } from "@/types";
+import type {
+  ApiError, LoginPayload, RegisterPayload, ForgotPasswordPayload, ResetPasswordPayload,
+} from "@/types";
 
 // ── useCurrentUser ────────────────────────────────────────────────
 export function useCurrentUser() {
@@ -77,6 +79,28 @@ export function useLogout() {
       clearAuth();
       queryClient.clear();
       router.replace("/login");
+    },
+  });
+}
+
+// ── useForgotPassword ────────────────────────────────────────────
+export function useForgotPassword() {
+  return useMutation<{ message: string }, ApiError, ForgotPasswordPayload>({
+    mutationFn: (payload) => authService.forgotPassword(payload),
+  });
+}
+
+// ── useResetPassword ─────────────────────────────────────────────
+export function useResetPassword() {
+  const router = useRouter();
+
+  return useMutation<{ message: string }, ApiError, ResetPasswordPayload>({
+    mutationFn: (payload) => authService.resetPassword(payload),
+    onSuccess: () => {
+      // Send them to sign in with a flag the login page can use to show a
+      // one-time confirmation — simpler and safer than auto-logging them in
+      // with a token that's about to be invalidated anyway.
+      router.push("/login?reset=success");
     },
   });
 }

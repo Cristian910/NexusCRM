@@ -4,49 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Zap, Users, TrendingUp, CheckSquare, BarChart2, Bell,
+  Users, TrendingUp, CheckSquare, BarChart2, Bell,
   ShieldCheck, ArrowRight, CodeXml, Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PipelineVisual } from "./pipeline-visual";
 import { KanbanPreview } from "./kanban-preview";
-
-const FEATURES = [
-  {
-    icon: Users,
-    title: "Client records that stay tidy",
-    description: "Every contact, company, and note in one searchable place — no more digging through spreadsheets.",
-  },
-  {
-    icon: TrendingUp,
-    title: "A pipeline you can drag",
-    description: "Move deals through Lead, Contacted, Negotiation, and Won with a Kanban board built for speed.",
-  },
-  {
-    icon: CheckSquare,
-    title: "Tasks tied to real work",
-    description: "Follow-ups and next steps linked straight to the deal and teammate they belong to.",
-  },
-  {
-    icon: BarChart2,
-    title: "Analytics that explain why",
-    description: "Win rates, pipeline value, and rep performance — read at a glance, not assembled by hand.",
-  },
-  {
-    icon: Bell,
-    title: "Notified, not overwhelmed",
-    description: "Real-time alerts when a deal moves, a task is due, or a teammate needs you.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Roles that actually restrict",
-    description: "Owner, Admin, Member, Viewer — permissions enforced on every request, not just hidden in the UI.",
-  },
-];
-
-const STACK = [
-  "Next.js 16", "React 19", "TypeScript", "NestJS", "PostgreSQL", "Prisma", "Redis", "BullMQ",
-];
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { Logomark } from "@/components/brand/logomark";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function LandingPage() {
   return (
@@ -63,6 +29,7 @@ export function LandingPage() {
 }
 
 function Nav() {
+  const { t } = useTranslation();
   return (
     <header
       className="sticky top-0 z-30 border-b backdrop-blur-md"
@@ -70,23 +37,22 @@ function Nav() {
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: "hsl(var(--primary))" }}>
-            <Zap className="h-4 w-4" style={{ color: "hsl(var(--primary-foreground))" }} />
-          </div>
-          <span className="text-sm font-semibold" style={{ color: "hsl(var(--foreground))" }}>NexusCRM</span>
+          <Logomark size={28} />
+          <span className="font-display text-sm font-semibold tracking-tight" style={{ color: "hsl(var(--foreground))" }}>NexusCRM</span>
         </Link>
 
         <nav className="hidden items-center gap-6 sm:flex">
-          <a href="#features" className="text-sm transition-colors" style={{ color: "hsl(var(--muted-foreground))" }}>Features</a>
-          <a href="#stack" className="text-sm transition-colors" style={{ color: "hsl(var(--muted-foreground))" }}>Stack</a>
+          <a href="#features" className="text-sm transition-colors" style={{ color: "hsl(var(--muted-foreground))" }}>{t("landing.navFeatures")}</a>
+          <a href="#stack" className="text-sm transition-colors" style={{ color: "hsl(var(--muted-foreground))" }}>{t("landing.navStack")}</a>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <LanguageSwitcher />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/login">Sign in</Link>
+            <Link href="/login">{t("landing.signIn")}</Link>
           </Button>
           <Button size="sm" asChild>
-            <Link href="/register">Get started</Link>
+            <Link href="/register">{t("landing.getStarted")}</Link>
           </Button>
         </div>
       </div>
@@ -95,6 +61,7 @@ function Nav() {
 }
 
 function Hero() {
+  const { t } = useTranslation();
   return (
     <section className="relative overflow-hidden px-4 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24">
       {/* Ambient glow */}
@@ -110,7 +77,7 @@ function Hero() {
           style={{ borderColor: "hsl(var(--border))", color: "hsl(var(--muted-foreground))", background: "hsl(var(--card))" }}
         >
           <Layers className="h-3 w-3" style={{ color: "hsl(var(--primary))" }} />
-          Multi-tenant CRM, built for small sales teams
+          {t("landing.heroEyebrow")}
         </motion.div>
 
         <motion.h1
@@ -118,9 +85,9 @@ function Hero() {
           className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
           style={{ color: "hsl(var(--foreground))", letterSpacing: "-0.03em" }}
         >
-          Your pipeline, finally
+          {t("landing.heroTitleLine1")}
           <br />
-          somewhere it belongs.
+          {t("landing.heroTitleLine2")}
         </motion.h1>
 
         <motion.p
@@ -128,8 +95,7 @@ function Hero() {
           className="mx-auto mt-5 max-w-xl text-base sm:text-lg"
           style={{ color: "hsl(var(--muted-foreground))" }}
         >
-          Clients, deals, tasks, and the numbers that matter — in one place your
-          whole team can actually keep up to date.
+          {t("landing.heroSubtitle")}
         </motion.p>
 
         <motion.div
@@ -138,11 +104,11 @@ function Hero() {
         >
           <Button size="lg" className="gap-2 w-full sm:w-auto" asChild>
             <Link href="/register">
-              Get started free <ArrowRight className="h-4 w-4" />
+              {t("landing.getStartedFree")} <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
-            <Link href="/login">Sign in</Link>
+            <Link href="/login">{t("landing.signIn")}</Link>
           </Button>
         </motion.div>
 
@@ -157,16 +123,26 @@ function Hero() {
 }
 
 function FeatureGrid() {
+  const { t } = useTranslation();
+  const features = [
+    { icon: Users,        title: t("landing.feature1Title"), description: t("landing.feature1Description") },
+    { icon: TrendingUp,   title: t("landing.feature2Title"), description: t("landing.feature2Description") },
+    { icon: CheckSquare,  title: t("landing.feature3Title"), description: t("landing.feature3Description") },
+    { icon: BarChart2,    title: t("landing.feature4Title"), description: t("landing.feature4Description") },
+    { icon: Bell,         title: t("landing.feature5Title"), description: t("landing.feature5Description") },
+    { icon: ShieldCheck,  title: t("landing.feature6Title"), description: t("landing.feature6Description") },
+  ];
+
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <SectionHeading
-        eyebrow="Everything, connected"
-        title="Built for how sales teams actually work"
-        description="No bolted-on modules — clients, deals, tasks, and analytics share the same data model from day one."
+        eyebrow={t("landing.featuresEyebrow")}
+        title={t("landing.featuresTitle")}
+        description={t("landing.featuresDescription")}
       />
 
       <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f, i) => (
+        {features.map((f, i) => (
           <motion.div
             key={f.title}
             initial={{ opacity: 0, y: 14 }}
@@ -194,22 +170,21 @@ function FeatureGrid() {
 }
 
 function ProductGlimpse() {
+  const { t } = useTranslation();
+  const lines = [t("landing.glimpseLine1"), t("landing.glimpseLine2"), t("landing.glimpseLine3")];
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
           <SectionHeading
-            eyebrow="The pipeline view"
-            title="See every deal, not just the next one"
-            description="Drag a deal from Lead to Won. The board updates instantly for everyone on your team — no refresh, no waiting."
+            eyebrow={t("landing.glimpseEyebrow")}
+            title={t("landing.glimpseTitle")}
+            description={t("landing.glimpseDescription")}
             align="left"
           />
           <ul className="mt-6 space-y-3">
-            {[
-              "Real-time stage updates across the team",
-              "Deal value and win probability per stage",
-              "Full audit trail of every stage change",
-            ].map((line) => (
+            {lines.map((line) => (
               <li key={line} className="flex items-start gap-2.5 text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
                 <span
                   className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
@@ -235,6 +210,9 @@ function ProductGlimpse() {
 }
 
 function TechStrip() {
+  const { t } = useTranslation();
+  const stack = ["Next.js 16", "React 19", "TypeScript", "NestJS", "PostgreSQL", "Prisma", "Redis", "BullMQ"];
+
   return (
     <section id="stack" className="border-y" style={{ borderColor: "hsl(var(--border))" }}>
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -242,10 +220,10 @@ function TechStrip() {
           className="mb-5 text-center text-xs font-medium uppercase tracking-wider"
           style={{ color: "hsl(var(--muted-foreground))" }}
         >
-          Built with a modern, production-grade stack
+          {t("landing.stackLabel")}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {STACK.map((s) => (
+          {stack.map((s) => (
             <span
               key={s}
               className="rounded-full border px-3 py-1 font-mono text-xs"
@@ -261,18 +239,19 @@ function TechStrip() {
 }
 
 function CtaBand() {
+  const { t } = useTranslation();
   return (
     <section className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 sm:py-28">
       <h2 className="text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "hsl(var(--foreground))" }}>
-        Ready to see your pipeline clearly?
+        {t("landing.ctaTitle")}
       </h2>
       <p className="mx-auto mt-3 max-w-md text-sm sm:text-base" style={{ color: "hsl(var(--muted-foreground))" }}>
-        Create an organization and invite your team — takes less than a minute.
+        {t("landing.ctaDescription")}
       </p>
       <div className="mt-7">
         <Button size="lg" className="gap-2" asChild>
           <Link href="/register">
-            Get started free <ArrowRight className="h-4 w-4" />
+            {t("landing.getStartedFree")} <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </div>
@@ -281,15 +260,14 @@ function CtaBand() {
 }
 
 function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="border-t" style={{ borderColor: "hsl(var(--border))" }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md" style={{ background: "hsl(var(--primary))" }}>
-            <Zap className="h-3.5 w-3.5" style={{ color: "hsl(var(--primary-foreground))" }} />
-          </div>
-          <span className="text-sm font-medium" style={{ color: "hsl(var(--foreground))" }}>NexusCRM</span>
-          <span className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>· a full-stack portfolio project</span>
+          <Logomark size={22} />
+          <span className="font-display text-sm font-semibold tracking-tight" style={{ color: "hsl(var(--foreground))" }}>NexusCRM</span>
+          <span className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>{t("landing.footerTagline")}</span>
         </div>
 
         {/* TODO: replace with the repo's real URL before deploying */}
@@ -301,7 +279,7 @@ function Footer() {
           style={{ color: "hsl(var(--muted-foreground))" }}
         >
           <CodeXml className="h-3.5 w-3.5" />
-          View source
+          {t("landing.viewSource")}
         </a>
       </div>
     </footer>

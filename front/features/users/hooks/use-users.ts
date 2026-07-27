@@ -10,6 +10,7 @@ import type { ApiError, SafeUser } from "@/types";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { queryKeys } from "@/lib/api/query-keys";
 import { toast } from "@/lib/stores/toast-store";
+import { t } from "@/lib/i18n/context";
 
 export const teamKeys = {
   all:  () => ["team"] as const,
@@ -37,9 +38,9 @@ export function useUpdateProfile() {
     onSuccess: (updated) => {
       setUser(updated);
       qc.setQueryData(queryKeys.auth.me, updated);
-      toast.success("Profile updated");
+      toast.success(t("toasts.profileUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update profile", err.message),
+    onError: (err) => toast.error(t("toasts.profileUpdateFailed"), err.message),
   });
 }
 
@@ -47,8 +48,8 @@ export function useUpdateProfile() {
 export function useChangePassword() {
   return useMutation<void, ApiError, ChangePasswordPayload>({
     mutationFn: usersService.changePassword,
-    onSuccess: () => toast.success("Password changed"),
-    onError: (err) => toast.error("Couldn't change password", err.message),
+    onSuccess: () => toast.success(t("toasts.passwordChanged")),
+    onError: (err) => toast.error(t("toasts.passwordChangeFailed"), err.message),
   });
 }
 
@@ -61,9 +62,9 @@ export function useInviteUser() {
     onSuccess: (newMember) => {
       qc.setQueryData<SafeUser[]>(teamKeys.list(), (old) => old ? [...old, newMember] : old);
       qc.invalidateQueries({ queryKey: teamKeys.list() });
-      toast.success("Invitation sent", `${newMember.firstName} has been added to the team.`);
+      toast.success(t("toasts.invitationSent"), t("toasts.invitationSentBody", { name: newMember.firstName }));
     },
-    onError: (err) => toast.error("Couldn't invite teammate", err.message),
+    onError: (err) => toast.error(t("toasts.inviteFailed"), err.message),
   });
 }
 
@@ -77,9 +78,9 @@ export function useUpdateUserRole() {
       qc.setQueryData<SafeUser[]>(teamKeys.list(), (old) =>
         old?.map((u) => (u.id === updated.id ? updated : u))
       );
-      toast.success("Role updated");
+      toast.success(t("toasts.roleUpdated"));
     },
-    onError: (err) => toast.error("Couldn't update role", err.message),
+    onError: (err) => toast.error(t("toasts.roleUpdateFailed"), err.message),
   });
 }
 
@@ -91,8 +92,8 @@ export function useDeactivateUser() {
     mutationFn: usersService.deactivate,
     onSuccess: (_data, id) => {
       qc.setQueryData<SafeUser[]>(teamKeys.list(), (old) => old?.filter((u) => u.id !== id));
-      toast.success("Teammate deactivated");
+      toast.success(t("toasts.teammateDeactivated"));
     },
-    onError: (err) => toast.error("Couldn't deactivate teammate", err.message),
+    onError: (err) => toast.error(t("toasts.deactivateFailed"), err.message),
   });
 }

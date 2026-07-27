@@ -6,6 +6,7 @@ import {
   dealAssignedTemplate,
   taskAssignedTemplate,
   taskReminderTemplate,
+  passwordResetTemplate,
 } from './templates/email.templates';
 
 @Injectable()
@@ -71,6 +72,8 @@ export class EmailService implements OnModuleInit {
         return taskAssignedTemplate(ctx as Parameters<typeof taskAssignedTemplate>[0]);
       case 'task-reminder':
         return taskReminderTemplate(ctx as Parameters<typeof taskReminderTemplate>[0]);
+      case 'password-reset':
+        return passwordResetTemplate(ctx as Parameters<typeof passwordResetTemplate>[0]);
       default:
         throw new Error(`Unknown email template: ${String(template)}`);
     }

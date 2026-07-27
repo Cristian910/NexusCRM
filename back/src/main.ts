@@ -32,7 +32,9 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   const port = parseInt(process.env.PORT ?? '3000', 10);
-  await app.listen(port);
+  // Render (and most PaaS) route traffic to the container's 0.0.0.0 interface,
+  // not just localhost — binding explicitly avoids "connection refused" on deploy.
+  await app.listen(port, '0.0.0.0');
 
   logger.log(`🚀  Application  → http://localhost:${port}/api/v1`);
   logger.log(`🌍  Environment  → ${process.env.NODE_ENV ?? 'development'}`);

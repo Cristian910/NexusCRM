@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface ChartWrapperProps {
   title: string;
@@ -79,7 +80,8 @@ export function ChartSkeleton({ height = 280, className }: { height?: number; cl
 }
 
 // ── Chart empty state ─────────────────────────────────────────────
-export function ChartEmpty({ message = "No data for this period" }: { message?: string }) {
+export function ChartEmpty({ message }: { message?: string }) {
+  const { t } = useTranslation();
   return (
     <div
       className="flex h-full flex-col items-center justify-center gap-2 rounded-lg"
@@ -94,13 +96,14 @@ export function ChartEmpty({ message = "No data for this period" }: { message?: 
         <rect x="22" y="20" width="6" height="16" rx="1" fill="currentColor" opacity="0.3" />
         <rect x="31" y="10" width="6" height="26" rx="1" fill="currentColor" opacity="0.3" />
       </svg>
-      <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>{message}</p>
+      <p className="text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>{message ?? t("analytics.noDataForPeriod")}</p>
     </div>
   );
 }
 
 // ── Chart error state ─────────────────────────────────────────────
 export function ChartError({ onRetry }: { onRetry?: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3">
       <div
@@ -117,7 +120,7 @@ export function ChartError({ onRetry }: { onRetry?: () => void }) {
       </div>
       <div className="text-center">
         <p className="text-sm font-medium" style={{ color: "hsl(var(--foreground))" }}>
-          Failed to load
+          {t("analytics.failedToLoad")}
         </p>
         {onRetry && (
           <button
@@ -125,7 +128,7 @@ export function ChartError({ onRetry }: { onRetry?: () => void }) {
             className="mt-1 text-xs transition-colors"
             style={{ color: "hsl(var(--primary))" }}
           >
-            Try again
+            {t("analytics.tryAgain")}
           </button>
         )}
       </div>

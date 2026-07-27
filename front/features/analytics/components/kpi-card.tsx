@@ -32,12 +32,14 @@ export function KpiCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, delay: index * 0.06, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-xl border p-5 transition-shadow duration-200 hover:shadow-lg"
+      className="group relative overflow-hidden rounded-xl border p-5 transition-shadow duration-200"
       style={{
         borderColor: "hsl(var(--border))",
         background: "hsl(var(--card))",
-        boxShadow: "0 0 0 1px hsl(var(--border)), 0 2px 4px -1px hsl(0 0% 0% / 0.08)",
+        boxShadow: "var(--shadow-card)",
       }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-card-hover)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-card)"; }}
     >
       {/* Subtle top-left glow on hover */}
       <div
@@ -61,10 +63,10 @@ export function KpiCard({
         </div>
       </div>
 
-      {/* Value */}
+      {/* Value — mono for tabular precision, matches every other figure in the app */}
       <div className="mt-3">
         <p
-          className="text-2xl font-bold tracking-tight tabular-nums"
+          className="font-mono text-2xl font-semibold tracking-tight tabular-nums"
           style={{ color: "hsl(var(--foreground))" }}
         >
           {value}
@@ -82,13 +84,13 @@ export function KpiCard({
               background: neutral
                 ? "hsl(var(--muted))"
                 : positive
-                ? "hsl(142.1 76.2% 36.3% / 0.12)"
-                : "hsl(0 72.2% 50.6% / 0.12)",
+                ? "hsl(var(--success) / 0.12)"
+                : "hsl(var(--destructive) / 0.12)",
               color: neutral
                 ? "hsl(var(--muted-foreground))"
                 : positive
-                ? "hsl(142.1 76.2% 46.3%)"
-                : "hsl(0 72.2% 60.6%)",
+                ? "hsl(var(--success))"
+                : "hsl(var(--destructive))",
             }}
           >
             {neutral ? (

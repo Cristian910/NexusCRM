@@ -12,6 +12,7 @@ import { useAnalyticsFilters } from "@/features/analytics/hooks/use-analytics-fi
 import { useAnalyticsOverview, useDealsAnalytics, useClientsAnalytics } from "@/features/analytics/hooks/use-analytics";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { formatDate } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/context";
 
 // ── Section wrapper with staggered fade-in ────────────────────────
 function Section({
@@ -52,8 +53,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ── Main component ────────────────────────────────────────────────
 export function DashboardClient() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
-  const { state, filters, setPreset } = useAnalyticsFilters();
+  const { state, filters, setPreset, setCustomRange } = useAnalyticsFilters();
 
   // Check if any query is loading to show on filter bar
   const overviewQ = useAnalyticsOverview(filters);
@@ -64,7 +66,7 @@ export function DashboardClient() {
   const periodLabel =
     state.dateFrom && state.dateTo
       ? `${formatDate(state.dateFrom, "MMM d")} – ${formatDate(state.dateTo, "MMM d, yyyy")}`
-      : "All time";
+      : t("dashboard.allTime");
 
   return (
     <div className="space-y-6 pb-8">
@@ -76,15 +78,18 @@ export function DashboardClient() {
               className="text-xl font-semibold tracking-tight"
               style={{ color: "hsl(var(--foreground))" }}
             >
-              {user ? `Welcome back, ${user.firstName}` : "Dashboard"}
+              {user ? t("dashboard.welcomeBack", { name: user.firstName }) : t("dashboard.title")}
             </h1>
             <p className="mt-0.5 text-sm" style={{ color: "hsl(var(--muted-foreground))" }}>
-              {periodLabel} · Your CRM at a glance
+              {t("dashboard.periodSummary", { period: periodLabel })}
             </p>
           </div>
           <FilterBar
             activePreset={state.preset}
             onPresetChange={setPreset}
+            dateFrom={state.dateFrom}
+            dateTo={state.dateTo}
+            onCustomRangeChange={setCustomRange}
             loading={anyFetching}
           />
         </div>
@@ -97,7 +102,7 @@ export function DashboardClient() {
 
       {/* ── Charts row 1: Funnel + Conversion ───────────────────── */}
       <Section delay={0.1}>
-        <SectionLabel>Pipeline</SectionLabel>
+        <SectionLabel>{t("dashboard.sectionPipeline")}</SectionLabel>
         <div className="mt-3 grid gap-4 lg:grid-cols-5">
           <div className="lg:col-span-3">
             <DealsFunnelChart filters={filters} />
@@ -110,7 +115,7 @@ export function DashboardClient() {
 
       {/* ── Charts row 2: Team + Top clients ────────────────────── */}
       <Section delay={0.15}>
-        <SectionLabel>Team & Clients</SectionLabel>
+        <SectionLabel>{t("dashboard.sectionTeamClients")}</SectionLabel>
         <div className="mt-3 grid gap-4 lg:grid-cols-2">
           <UserPerformanceChart filters={filters} />
           <TopClientsTable filters={filters} />
@@ -119,7 +124,7 @@ export function DashboardClient() {
 
       {/* ── Stats summary ────────────────────────────────────────── */}
       <Section delay={0.2}>
-        <SectionLabel>Quick stats</SectionLabel>
+        <SectionLabel>{t("dashboard.sectionQuickStats")}</SectionLabel>
         <div className="mt-3">
           <QuickStats filters={filters} />
         </div>
@@ -130,24 +135,25 @@ export function DashboardClient() {
 
 // ── Quick stats strip ─────────────────────────────────────────────
 function QuickStats({ filters }: { filters: ReturnType<typeof useAnalyticsFilters>["filters"] }) {
+  const { t } = useTranslation();
   const { data, isLoading } = useDealsAnalytics(filters);
   const clientData = useClientsAnalytics(filters).data;
 
   const stats = [
     {
-      label: "Avg. deal value",
+      label: t("dashboard.avgDealValue"),
       value: data ? `$${Math.round(data.averageDealValue).toLocaleString()}` : "—",
     },
     {
-      label: "Deals lost",
+      label: t("dashboard.dealsLost"),
       value: data ? String(data.lostDeals) : "—",
     },
     {
-      label: "Clients with deals",
+      label: t("dashboard.clientsWithDeals"),
       value: clientData ? String(clientData.clientsWithDeals) : "—",
     },
     {
-      label: "New clients",
+      label: t("dashboard.newClients"),
       value: clientData ? String(clientData.newClientsInPeriod) : "—",
     },
   ];

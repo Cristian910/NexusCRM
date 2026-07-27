@@ -11,10 +11,12 @@ import {
   useMarkAllAsRead,
 } from "@/features/notifications/hooks/use-notifications";
 import { Pagination } from "@/components/ui/pagination";
+import { useTranslation } from "@/lib/i18n/context";
 
 const LIMIT = 20;
 
 export function NotificationsClient() {
+  const { t } = useTranslation();
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -29,8 +31,8 @@ export function NotificationsClient() {
     <div className="space-y-4 pb-8">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
         <PageHeader
-          title="Notifications"
-          description="Stay informed about activity in your workspace"
+          title={t("notifications.pageTitle")}
+          description={t("notifications.pageDescription")}
           actions={
             <div className="flex items-center gap-2">
               <button
@@ -42,7 +44,7 @@ export function NotificationsClient() {
                   color: unreadOnly ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
                 }}
               >
-                Unread only
+                {t("notifications.unreadOnly")}
               </button>
               <Button
                 variant="outline"
@@ -52,7 +54,7 @@ export function NotificationsClient() {
                 disabled={markAllRead.isPending}
               >
                 <Check className="h-3.5 w-3.5" />
-                Mark all read
+                {t("notifications.markAllRead")}
               </Button>
             </div>
           }
@@ -91,7 +93,7 @@ export function NotificationsClient() {
           limit={LIMIT}
           onPageChange={setPage}
           isLoading={isLoading}
-          itemLabel="notifications"
+          itemLabel={t("common.items")}
         />
       )}
     </div>
@@ -116,6 +118,7 @@ function NotificationsSkeleton() {
 }
 
 function NotificationsEmpty({ unreadOnly }: { unreadOnly: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-20">
       <div
@@ -126,12 +129,12 @@ function NotificationsEmpty({ unreadOnly }: { unreadOnly: boolean }) {
       </div>
       <div className="text-center">
         <p className="text-sm font-medium" style={{ color: "hsl(var(--foreground))" }}>
-          {unreadOnly ? "No unread notifications" : "All caught up"}
+          {unreadOnly ? t("notifications.noUnread") : t("notifications.allCaughtUp")}
         </p>
         <p className="mt-1 text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>
           {unreadOnly
-            ? "Switch off the filter to see all notifications"
-            : "New activity in your workspace will appear here"}
+            ? t("notifications.switchOffFilter")
+            : t("notifications.newActivityHere")}
         </p>
       </div>
     </div>
