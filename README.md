@@ -10,7 +10,7 @@ Multi-tenant, con roles reales, tiempo real, colas en background y un sistema de
 
 <br/>
 
-[![Ver demo en vivo](https://img.shields.io/badge/🚀_VER_DEMO_EN_VIVO-14B8A6?style=for-the-badge&logoColor=white)](#)
+[![Ver demo en vivo](https://img.shields.io/badge/🚀_VER_DEMO_EN_VIVO-14B8A6?style=for-the-badge&logoColor=white)](https://nexus-crm-blond.vercel.app)
 
 **org:** `demo` &nbsp;·&nbsp; **email:** `demo@nexuscrm.io` &nbsp;·&nbsp; **password:** `Demo1234!`
 &nbsp;— o entra directo con el botón **"Explore the live demo"** en el login, sin registrarte.
@@ -47,17 +47,23 @@ La mayoría de los CRM de portafolio son un CRUD con login. Este resuelve los pr
 
 ## Vista previa
 
-<!-- Reemplaza esto con capturas reales una vez desplegado — dashboard, kanban y analytics son las tres pantallas más representativas -->
+![Dashboard](docs/dashboard.png)
 
-|  Dashboard  |  Pipeline (Kanban)  |  Analytics  |
-|:---:|:---:|:---:|
-| _captura pendiente_ | _captura pendiente_ | _captura pendiente_ |
+<br/>
+
+## ¿Para quién es esto y qué problema resuelve?
+
+Un equipo de ventas pequeño (5-15 personas) —una agencia, una consultora, una startup en etapa temprana— necesita llevar su pipeline de algún lado. Las opciones típicas son un spreadsheet compartido que nadie actualiza a tiempo, o pagar $20-80 USD por usuario/mes en Salesforce o HubSpot por funciones que van a usar al 10%.
+
+NexusCRM cubre el punto medio: lo esencial de un CRM real —pipeline visual, clientes, tareas de seguimiento, y métricas de qué tan bien está yendo el equipo— sin la curva de aprendizaje ni el costo de las plataformas enterprise. Cada organización que se registra está completamente aislada de las demás (multi-tenant real, no una casilla de "empresa" en una tabla compartida), así que el mismo código sirve para una organización o para mil, sin cambiar una línea.
+
+Como pieza de portafolio, existe para demostrar algo más específico: que puedo llevar un producto completo —no un CRUD de ejemplo— desde el modelo de datos hasta producción, incluyendo las decisiones incómodas que un tutorial nunca cubre (¿qué pasa si dos usuarios mueven el mismo negocio a la vez? ¿qué le muestro a un rol que no tiene permiso? ¿qué pasa si el proveedor de email está caído?).
 
 <br/>
 
 ## Arquitectura de despliegue
 
-Cuatro proveedores, cada uno elegido específicamente porque su plan gratuito **no expira ni se borra** — nada de pruebas de 30 días. Este diagrama es literalmente cómo corre la demo en vivo ahora mismo:
+**Ningún proveedor de esta lista fue elegido solo "porque es gratis" — cada uno es gratis *y* tiene la capacidad real que esta parte del proyecto necesita.** Eso fue deliberado: es fácil armar un stack gratuito que se rompe en cuanto el proyecto hace algo mínimamente serio (una cola de trabajos, una conexión persistente, una base de datos que no se borre sola). Este no se rompe.
 
 ```mermaid
 flowchart LR
@@ -83,15 +89,15 @@ flowchart LR
     style UP fill:#0f0f0f,stroke:#DC382D,color:#fff
 ```
 
-| Capa | Dónde vive | Por qué esa elección |
-|---|---|---|
-| **Frontend** | [Vercel](https://vercel.com) | Hecho por el equipo de Next.js — despliegue sin configuración, gratis de forma indefinida |
-| **API** | [Render](https://render.com) | Free tier permanente. Se duerme a los 15 min sin tráfico y despierta en 30-60s — compromiso razonable a cambio de $0/mes para siempre |
-| **Base de datos** | [Neon](https://neon.tech) | Postgres serverless, plan gratuito **permanente** — a diferencia del Postgres gratis de Render, que se **elimina a los 30 días** |
-| **Redis** | [Upstash](https://upstash.com) | Redis serverless, plan gratuito permanente (256 MB / 500K comandos al mes), usado por BullMQ y por el cache de analytics |
+| Capa | Dónde vive | Alcance |
+|---|---|---|---|
+| **Frontend** | [Vercel](https://vercel.com) | CDN global, HTTPS automático, build optimizado de Next.js sin tocar configuración |
+| **API** | [Render](https://render.com) | Proceso Node persistente de verdad (no funciones serverless con límite de duración) — necesario porque este backend mantiene WebSockets abiertos y workers de BullMQ corriendo en segundo plano |
+| **Base de datos** | [Neon](https://neon.tech) | Postgres real (no una versión recortada), branching de bases de datos incluido, **el plan nunca expira ni se borra** |
+| **Redis** | [Upstash](https://upstash.com) | Redis real vía protocolo estándar (compatible con BullMQ tal cual, sin adaptar código), facturación por comando en vez de por servidor encendido, **permanente** |
 
-> 📍 **Demo en vivo:** frontend en `https://[tu-app].vercel.app` · API en `https://[tu-api].onrender.com`
-> _(reemplazar con las URLs reales una vez desplegado)_
+> 📍 **Demo en vivo:** frontend en `https://nexus-crm-blond.vercel.app`
+>
 
 <br/>
 
